@@ -1,15 +1,64 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  
+    <controlPanel
+      :width = 'sysWidth * 0.3'
+      :height = 'sysHeight * 0.4 - 2 * border'
+      :top = "border"
+      :left = "border"
+    />
+    <graphStatisticView 
+      :width = 'sysWidth * 0.3'
+      :height = 'sysHeight * 0.6'
+      :top = "sysHeight * 0.4"
+      :left = "border"
+    />
+    <beView 
+      :width = 'sysWidth * 0.3'
+      :height = 'sysHeight * 0.5'
+      :top = "border"
+      :left = " sysWidth * 0.3 + 2 * border"
+    />
+    <sgView 
+      :width = 'sysWidth * 0.3'
+      :height = 'sysHeight * 0.5 - 2 * border'
+      :top = "sysHeight * 0.5 + 2 * border"
+      :left = "sysWidth * 0.3 + 2 * border"
+    />
+    <visualSummaryView 
+      :width = 'sysWidth * 0.4 - 4 * border'
+      :height = 'sysHeight * 1 - 2 * border'
+      :top = "border"
+      :left = "sysWidth * 0.6 + 3 * border"
+    />
+
+
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import beView from './components/beView.vue'
+import controlPanel from './components/controlPanel.vue'
+import graphStatisticView from './components/graphStatisticView.vue'
+import sgView from './components/sgView.vue'
+import visualSummaryView from './components/visualSummaryView.vue'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    controlPanel,
+    beView,
+    graphStatisticView,
+    visualSummaryView,
+    sgView
+  },
+  data(){
+    return {
+      //这两个变量是浏览器页面的大小，通过props遗传到子组件
+      // width:document.documentElement.clientWidth ,
+      // height:document.documentElement.clientHeight,
+      sysWidth: 1800,
+      sysHeight: 1000,
+      border: 10
+    }
   }
 }
 </script>
