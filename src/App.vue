@@ -18,13 +18,13 @@
       :top = "border"
       :left = " sysWidth * 0.3 + 2 * border"
     />
-    <sgView 
+    <sgView  v-if = "summaryViewState"
       :width = 'sysWidth * 0.3'
       :height = 'sysHeight * 0.5 - 2 * border'
       :top = "sysHeight * 0.5 + 2 * border"
       :left = "sysWidth * 0.3 + 2 * border"
     />
-    <visualSummaryView 
+    <visualSummaryView v-if = "summaryViewState"
       :width = 'sysWidth * 0.4 - 4 * border'
       :height = 'sysHeight * 1 - 2 * border'
       :top = "border"
@@ -40,7 +40,7 @@ import controlPanel from './components/controlPanel.vue'
 import graphStatisticView from './components/graphStatisticView.vue'
 import sgView from './components/sgView.vue'
 import visualSummaryView from './components/visualSummaryView.vue'
-
+import { mapState } from 'vuex'
 export default {
   name: 'App',
   components: {
@@ -55,10 +55,17 @@ export default {
       //这两个变量是浏览器页面的大小，通过props遗传到子组件
       // width:document.documentElement.clientWidth ,
       // height:document.documentElement.clientHeight,
-      sysWidth: 1800,
-      sysHeight: 1000,
-      border: 10
+      sysWidth: 2200,
+      sysHeight: 1200,
+      border: 10,
+      // flag: false
     }
+  },
+  computed:{
+      ...mapState(["summaryViewState"])
+  },
+  mounted(){
+    // setTimeout(function(){ this.flag = true }, 3000);
   }
 }
 </script>

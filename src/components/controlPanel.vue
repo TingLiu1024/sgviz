@@ -2,7 +2,6 @@
   <div id="control" :style = "divCss">
     <el-divider > Console </el-divider>
     <el-row> 
-      
       <el-select v-model="selectLogId" class="m-2" placeholder="Select" @change="updateLogId">
     <el-option
       v-for="(item,i) in logList"
@@ -12,13 +11,19 @@
     />
   </el-select>
     </el-row>
+    <img :src = "imgPath" :width="width">
+    <!-- <img src = "../assets/images/ring_front_center/0ef28d5c-ae34-370b-99e7-6709e1c4b929/ring_front_center_315969338033780896.jpg"> -->
+    <!-- <img src = "../assets/logo.png"> -->
+
     
     
   </div>
 </template>
 
 <script>
-import {  mapGetters } from 'vuex'
+import {  mapGetters, mapState } from 'vuex'
+import logToImgList from "../assets/images/ring_front_center/logToImgList.json"
+
 export default {
   name: 'controlPanel',
   props: {
@@ -29,28 +34,47 @@ export default {
     left:Number,
   },
   data(){
-    this.$store.commit('updateLogId', "0ef28d5c-ae34-370b-99e7-6709e1c4b929")
+    let logId = "0ef28d5c-ae34-370b-99e7-6709e1c4b929"
+    this.$store.commit('updateLogId', logId)
+    this.$store.dispatch('getDataset', logId)
+    const imageType = "ring_front_center"
+    
+    let files = logToImgList[logId]
+    files.sort()
+      
 
     return {
-
-      selectLogId:"0ef28d5c-ae34-370b-99e7-6709e1c4b929"
+      selectLogId:logId,
+      imageType: imageType,
+      imgList:files,
+      logToImgList:logToImgList
 
     }
   },
   computed:{
     ...mapGetters(["logList"]),
+    ...mapState(["currentTime"]),
     divCss(){
         return "position: absolute; border: 0px solid black;" +  
               "height:" + this.height + "px;" +
               "width:" + this.width + "px;" +
               "left:" + this.left + "px;" +
               "top:" + this.top + "px;" 
+    },
+    imgPath(){
+      // https://blog.csdn.net/qq_37235616/article/details/109307700
+      return require('../assets/images/' + this.imageType + '/' + this.selectLogId + '/' + this.imgList[parseInt(this.currentTime)])
     }
+      
   },
   methods:{
     updateLogId(){
       // this.logId = this.selectLogId
       this.$store.commit('updateLogId', this.selectLogId)
+      this.$store.dispatch('getDataset',this.selectLogId)
+      let files = this.logToImgList[this.selectLogId]
+      files.sort()
+      this.imgList = files
 
     }
   }

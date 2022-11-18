@@ -16,12 +16,7 @@ import { faPause } from '@fortawesome/free-solid-svg-icons'
 import { faPlay } from '@fortawesome/free-solid-svg-icons'
 
 
-
-
 library.add(faPause,faPlay)
-
-
-
 
 
 const app = createApp(App)
