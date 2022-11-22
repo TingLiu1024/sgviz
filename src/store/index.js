@@ -22,7 +22,10 @@ export default createStore({
     currentTime:0,
     summaryViewState: false,
     sgCurrentOverLane:"100",//记录sgview mouseover的道路
-    sgCurrentOverCar:"100"
+    sgCurrentOverCar:"100",
+    currentEventData:"",
+    sgBrushGraph:{"nodes":[],"edges":[]},
+    currentEgoData:"",
 
     
   },
@@ -44,6 +47,7 @@ export default createStore({
     state.mapCenter = state.currentTrackingData["mapCenter"]
     state.mapRange = state.currentTrackingData["mapRange"]
     state.currentSgData = data[1]
+    state.currentEventData = data[2]
     state.summaryViewState = true
    },
    updateTime(state, tsp){
@@ -55,13 +59,20 @@ export default createStore({
    },
    updateSgCurrentOverCar(state, carId){
     state.sgCurrentOverCar = carId
+   },
+   updateSgBrushData(state, data){
+    state.sgBrushGraph = data
+   },
+   updateCurrentEgoData(state, data){
+    state.currentEgoData = data
    }
 
   },
   actions: {
     async getDataset(context, id_) {
         await Promise.all([d3.json("./trackingData/"+id_ +".json"),
-        d3.json("./sgData/"+id_ +".json")]).then(function(data) {
+        d3.json("./sgData/"+id_ +".json"), d3.json("./behaviour/"+id_ +".json"),
+      ]).then(function(data) {
             context.commit('updateDataset', data)
         })
     },

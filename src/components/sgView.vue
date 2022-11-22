@@ -1,7 +1,8 @@
 <template>
   <div id="sgView" :style = "divCss">
     <el-divider>Scene Graph View</el-divider>
-    <svg :width="svgWidth" :height="svgWidth">
+    <svg :width="svgWidth" :height="svgWidth" id ="sgsvg">
+     <path :d = "lineGenerator(lassoPol)" fill = "none" stroke = "grey" stroke-dasharray = "5,5"></path>
       <g id ="dynamicGroup"> </g>
     </svg>
     <div id="sgTip" :style="tooltip_css" v-html="tooltipContent"></div>
@@ -9,8 +10,11 @@
 </template>
 
 <script>
+
+
 import {mapState} from "vuex"
 import * as d3 from "d3"
+// import * as d3Lasso from "d3-lasso"
 import $ from "jquery"
 export default {
   name: 'sgView',
@@ -23,12 +27,16 @@ export default {
   },
   data(){
     return {
-      fdgMargin: 30, // 用来调整比例尺保证结点都在图中
+      fdgMargin: 20, // 用来调整比例尺保证结点都在图中
       lastFdgLayout: [], //
       // tooltip :$("#bevTip"),
       
       relStrokeColorDict:{"in":"#a6761d", "frontOrBehind":"#a65628", "leftOrRight":"#b3b3b3"},
       tooltipContent:"",
+      lassoPol:[],
+      lassoStart:"",
+      lassoFlag:false,
+      lineGenerator:d3.line(),
       tooltip_css:
         "position: absolute;padding: 7px;font-size: 0.9em;pointer-events: none;background: #fff;border: 1px solid #ccc;" +
         "border-radius: 4px;-moz-box-shadow: 3px 3px 10px 0px rgba(0, 0, 0, 0.25);display:none" +
@@ -65,15 +73,49 @@ export default {
     this.plotOneStampFdg(0, this.currentSgData)
   },
   methods:{
+    inside(point, vs) {
+    // ray-casting algorithm based on
+    // https://wrf.ecse.rpi.edu/Research/Short_Notes/pnpoly.html/pnpoly.html
+    
+    var x = point[0], y = point[1];
+    
+    var inside = false;
+    for (var i = 0, j = vs.length - 1; i < vs.length; j = i++) {
+        var xi = vs[i][0], yi = vs[i][1];
+        var xj = vs[j][0], yj = vs[j][1];
+        
+        var intersect = ((yi > y) != (yj > y))
+            && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+        if (intersect) inside = !inside;
+    }
+    
+    return inside;
+},
      plotOneStampFdg(tsp, data) {
         if(!data){
             return []
         }
+        // function lassoStart(){
+        //   console.log('lasso start')
+        // }
+        let cur = this
       let dynamicGroup = d3.select("#dynamicGroup")
-      let cur = this
+      
+      
+      //   let lasso = d3Lasso.lasso()
+      //   .closePathSelect(true)
+      //       .closePathDistance(100)
+      //       .on("start", lassoStart)
+      // dynamicGroup.call(lasso);
+
+      
       let lastFdgLayout = this.lastFdgLayout
       let scaleFdgX = this.scaleX, scaleFdgY = this.scaleY, laneColor = this.laneColor, 
         vehColor = this.vehColor, peoColor = this.peoColor, egoColor = this.egoColor
+      let maxCityX =  this.mapCenter[0] + this.mapRange,
+      minCityX = this.mapCenter[0] - this.mapRange,
+      maxCityY = this.mapCenter[1] + this.mapRange,
+      minCityY = this.mapCenter[1] - this.mapRange
 
                 const graph = data[tsp.toString()]
     
@@ -89,8 +131,10 @@ export default {
                     // 车道固定位置， 已有位置按原位置分配， 没有的若能匹配到车道，则初始位置为对应车道，否则，按本身的地理位置分配
 
                     if (d.label_class == "LANE") {
-                        const meanX = d3.mean(d3.map(d.polygon.slice(0,-1), a => a[0]))
-                        const meanY = d3.mean(d3.map(d.polygon.slice(0,-1), a => a[1]))
+                      let pol = d3.filter(d.polygon.slice(0,-1),
+                        k => k[0] > minCityX & k[0] < maxCityX & k[1] > minCityY & k[1] < maxCityY)
+                        const meanX = d3.mean(d3.map(pol, a => a[0]))
+                        const meanY = d3.mean(d3.map(pol, a => a[1]))
                     
                         d.fx = scaleFdgX(meanX)
                         d.fy = scaleFdgY(meanY)
@@ -142,15 +186,20 @@ export default {
                     .force("charge", d3.forceManyBody().strength(-3).distanceMax(30))
 
                 // 定义人物节点之间连线的信息
-                let link = dynamicGroup.append("g")
+                let link = dynamicGroup
                      //#999
-                    .attr("stroke-opacity", 1)
-                    .selectAll("line") // 用line元素来绘制
+                    
+                    .selectAll(".linkeLine") // 用line元素来绘制
                     .data(graph.links) // 绑定json文件中的links数据
-                    .join("line")
+                    .enter()
+                    .append("line")
+                    // .join("line")
+                    
+                    .attr("stroke-opacity", 1)
                     .attr("stroke-width", 3) // 连线粗细通过线的value计算
                     .attr("stroke", d => cur.relStrokeColorDict[d["relation"]])
                     .on('mouseover', function (event, d) {
+                      
                       let tooltip = $("#sgTip");
                       // console.log('tooltip', d)
                       cur.tooltipContent =   "<p> source: " + d.source.track_label_uuid + "<br>" + 'target: '+ 
@@ -159,6 +208,7 @@ export default {
                       tooltip.css("display", "block");
                       tooltip.css("left", event.offsetX + 40);
                       tooltip.css("top", event.offsetY - 10);
+                      
                       
                     })
                     .on('mouseout', function () {
@@ -245,6 +295,7 @@ export default {
                       let tooltip = $("#sgTip");
                       tooltip.css("display", "none");
                       cur.$store.commit("updateSgCurrentOverLane", "100")
+                      cur.$store.commit("updateSgCurrentOverCar", "100")
 
                     })
 
@@ -288,6 +339,43 @@ export default {
                     event.subject.fx = null;
                     event.subject.fy = null;
                 }
+
+                d3.select("#sgsvg").on("mousedown",(event)=>{
+        cur.lassoFlag = true
+        cur.lassoPol = []
+        // console.log(event)
+        cur.lassoStart = [event.offsetX, event.offsetY]
+        cur.lassoPol.push([event.offsetX, event.offsetY])
+      })
+      .on("mousemove", (event)=>{
+        if( cur.lassoFlag){
+
+          cur.lassoPol.push([event.offsetX, event.offsetY])
+        }
+        
+      })
+      .on("mouseup", ()=>{
+        cur.lassoFlag = false
+        cur.lassoPol.push(cur.lassoStart)
+        let lassoEle = {"nodes":[], "edges": []}
+        node.selectChildren().each(d=>{
+          // console.log(d)
+          if (cur.inside([d.x, d.y], cur.lassoPol)){
+            lassoEle["nodes"].push(d)
+            // console.log(d)
+          } 
+        })
+        dynamicGroup.selectAll("line").each(d=>{
+          // console.log(d)
+          if (cur.inside([d.source.x, d.source.y], cur.lassoPol) &
+          cur.inside([d.target.x, d.target.y], cur.lassoPol)){
+            lassoEle["edges"].push(d)
+            // console.log(d)
+          } 
+        })
+        console.log(lassoEle)
+        cur.$store.commit('updateSgBrushData', lassoEle)
+      })
                 return graph.nodes
 
             }

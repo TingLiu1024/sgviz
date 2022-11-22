@@ -148,7 +148,7 @@ export default {
         "px;" +
         "top:" +
         (this.height - this.sliderH) +
-        "px;"
+        "px;margin-top:5px"
       );
     },
     svgWidth() {

@@ -1,18 +1,27 @@
 <template>
   <div id="visualSummaryView" :style = "divCss">
-    <el-divider>Visual Summary View</el-divider>
-    <svg id = "svg" :width = "width" :height="lineChartHeight + streamHeight"> 
+    <el-divider>Statistical Summary View</el-divider>
+    <!-- :width = "width" :height="lineChartHeight + streamHeight" -->
+    <!-- transform="rotate(-90)" -->
+    <svg id = "svg" 
+    :width = "width" :height="lineChartHeight + streamHeight  + marginTop * 2"
+    > 
       <g id = "line" :transform ="`translate(${marginLeft},${marginTop})`">
-        <g v-if = "yawList.length" id = "egoCar"
-        :transform="`translate(${timeScale(parseInt(currentTime))}, ${yScale(
+        <!-- v-if = "yawList.length"  -->
+        
+      </g>
+      <g 
+        v-if = "yawList.length" 
+        id = "egoCar"
+        :transform="`translate(${marginLeft+timeScale(parseInt(currentTime))}, ${marginTop+yScale(
           yawList[parseInt(currentTime)]
         )})`"
       >
         <path :d="drawStar(egoSize)" :fill="egoColor" fill-opacity="0.9" />
       </g>
-      </g>
       
       <g id ="lineLegend" :transform ="`translate(${marginLeft + 30},${marginTop})`"> 
+        <g id = "lineLegendText"></g>
         <rect :width="legendW"
             :height="legendH"
             x="0"
@@ -50,8 +59,10 @@
 
       </g>
       
-      <g id = "streamGraph"> 
-       
+      <g id = "streamGraph">   
+      </g>
+      <g id = "heatmap">   
+        
       </g>
       <!-- <use id="use" xlink:href="#egoCar" /> -->
     </svg>
@@ -64,6 +75,7 @@
 import { mapState } from "vuex";
 import * as d3 from "d3";
 import $ from "jquery";
+// import _ from 'lodash'
 export default {
   name: 'visualSummaryView',
   props: {
@@ -75,10 +87,11 @@ export default {
   },
   data(){
     return {
-      lineChartHeight:300,
+      lineChartHeight:250,
       marginLeft:36,
       marginTop:15,
-      streamHeight: 300,
+      marginRight:15,
+      streamHeight: 250,
       lineHalfWidth:3, //控制线的宽度
       intersectionStrokeColor:"#e41a1c",
       leftTurnColor:"#ff7f00",
@@ -101,11 +114,14 @@ export default {
         "PEOPLE_notOnLane":"#FFCDBF", "PEOPLE_onLane":"#FF8680", "VEHICLE_onLane":"#1f78b4","VEHICLE_notOnLane":"#a6cee3",
         "PEOPLE": "#D25565" ,"VEHICLE":"#3E6D9C"
       },
+      egoFlag:false,
+      heatRectH:"",
+      
       
     }
   },
   computed:{
-    ...mapState(["currentTrackingData", "mapAll", "currentTime", "egoColor"]),
+    ...mapState(["currentTrackingData", "mapAll", "currentTime", "egoColor","currentEventData"]),
     divCss(){
         return "position: absolute; border: 0px solid black;" +  
               "height:" + this.height + "px;" +
@@ -125,13 +141,20 @@ export default {
     timeScale(){
         return d3.scaleLinear()
                 .domain([this.timeRange[0], this.timeRange[1]])
-                .range([0, this.width - 10]);
+                .range([0, this.width - this.marginRight]);
     },
     yScale() {
       return d3.scaleLinear()
                 .domain([-120, 180])
                 .range([this.lineChartHeight, 0]);
     },
+    eventHeatmapHeight(){
+      let rectH = (this.width - this.marginRight) / (this.timeRange[1] + 1)
+      // this.heatRectH = rectH
+      // console.log(rectH)
+      return rectH * 14
+
+    }
     
     
   },
@@ -140,7 +163,8 @@ export default {
       // while (!this.currentTrackingData){ss
       //   setTimeout(function(){},3000)
       let cur = this
-      const legendG = d3.select('#lineLegend')
+      const legendG = d3.select('#lineLegendText')
+      legendG.selectChildren().remove()
       legendG.selectAll(".lineText").data(["Speed", "Left Turn", "Right Turn", "Straight", "Intersection"]).enter()
       .append("text").attr("x",40).attr("y", (d,i)=>{return 10 + i * (cur.legendInterVal+
         cur.legendH)}).text(d=>d)
@@ -186,7 +210,7 @@ export default {
         tmp["oriData"].forEach(function(d){
           uppers.push([d.frame, d.yawMod + cur.lineHalfWidth])
           speedLowers.push([scaleX(d.frame), scaleY(d.yawMod + cur.lineHalfWidth)-5])
-          speedUppers.push([scaleX(d.frame) , scaleY(d.yawMod + cur.lineHalfWidth)-scaleSpeed(d.speed)])
+          speedUppers.push([scaleX(d.frame) , scaleY(d.yawMod + cur.lineHalfWidth)-scaleSpeed(d.speed)-5])
           lowers.push([d.frame, d.yawMod - cur.lineHalfWidth])
         })
         
@@ -213,6 +237,7 @@ export default {
       // console.log(linesData)
       
       let linesGroup = d3.select("#line")
+      linesGroup.selectChildren().remove()
       // let svg = d3.select("#svg")
       linesGroup.append("g")
             .attr("transform", `translate(0,${this.lineChartHeight})`)
@@ -247,6 +272,7 @@ export default {
             //  speed
             linesGroup.append("g").selectAll('.speedPath').data([speedPol]).enter().append("path")
             .attr("d", d=>d3.line()(d)).attr("fill",this.speedFillColor).attr("opacity", 0.6)
+            // d3.select("#svg").appendChild("#")
             
            
 
@@ -325,6 +351,7 @@ export default {
       let cur = this
       const group = d3.select("#streamGraph")
       .attr("transform", `translate(${cur.marginLeft}, ${cur.marginTop + cur.lineChartHeight})`)
+      group.selectChildren().remove()
       
 
                 let countData = this.getStreamGraphData(this.currentTrackingData["trackingInfos"])
@@ -380,12 +407,7 @@ export default {
                     + d[currentT].data[d.key] + "<br>"
                         + "Timestamp : " + currentT
                   
-                    
-                  
-                    
-                  
-                    
-                    
+     
                     // console.log(d);
                     //console.log(d[mousedate].data);
                     
@@ -438,8 +460,115 @@ export default {
         .style("opacity",1)
         .style("font-size", "12px")
 
+    },
+    plotEventheatmap(){
+      // window.evetData = this.currentEventData
+      const countData = d3.rollups(this.currentEventData["object"], v => v.length, 
+      d=> d.frame, d=> d.label_class, d=> d.event)
+      
+      let heatmapData = []
+      countData.forEach(function (curtimeEvent){
+        let tmpDict = {}
+        tmpDict["frame"] = curtimeEvent[0]
+        curtimeEvent[1].forEach( labelData => {
+          tmpDict["label_class"] = labelData[0]
+          labelData[1].forEach(eventData => {
+            tmpDict['event'] = eventData[0]
+            tmpDict['count'] = eventData[1]
+          })
+
+        })
+        heatmapData.push(tmpDict)
+      })
+      // console.log(heatmapData)
+      const rectH = this.eventHeatmapHeight / 14
+      let cur = this
+      const group = d3.select("#heatmap")
+      .attr("transform", `translate(${cur.marginLeft}, ${cur.marginTop + cur.lineChartHeight + cur.streamHeight})`)
+      group.selectChildren().remove()
+      const heatmapYscale = d3.scalePoint().domain(["freeObjectDisappear",'laneObjectDisappear',
+      "freeObjectAppear",'laneObjectAppear', "freeToLane", "laneToFree", "changeLane"
+    ]).range([0, rectH * 6])
+    let minRectRatio = 0.55
+    const rectHScale = d3.scaleLinear().domain( d3.extent(
+      d3.map(heatmapData, d=> d.count)
+    )).range([rectH * minRectRatio, rectH])
+    // const opacityScale = d3.scaleLinear().domain([1, d3.max(
+    //   d3.map(heatmapData, d=> d.count)
+    // )]).range([0.3,1])
+    let lineGen = d3.line()
+    group.append("g").selectAll(".borderPath").data([0,1,2,3,4,5,6,7,
+    8,9,10,11,12,13,14]).enter().append("path")
+    .attr('d', d => {
+        return lineGen([[0, d * rectH], [rectH * cur.timeRange[1], d * rectH]])}
+      )
+      .attr("stroke-width", 0.5)
+      .attr("stroke", "grey")
+      .attr("stroke-opacity", 0.5)
+    let tooltip = $("#summaryTip");
+      group.append("g").selectAll(".objectRect").data(heatmapData).enter().append("rect")
+      .attr('x', (d) => d.frame * rectH)
+      .attr('y', (d) => d.label_class == "VEHICLE"?heatmapYscale(d.event):(rectH *7 + heatmapYscale(d.event)))
+      .attr('width', d => rectHScale(d.count))
+      .attr('height', d => rectHScale(d.count))
+      .attr('transform', d => "translate(" + (rectH - rectHScale(d.count))/2 +"," + (rectH - rectHScale(d.count))/2
+      + ")")
+      .attr('fill', d => cur.streamColorDict[d.label_class] )
+      .attr("opacity", d => {
+        // console.log(d)
+        if (d.event.indexOf("Disappear")!= -1){
+          return 0.5
+        }
+        else{
+          return 1
+        }
+      }
+      // d => opacityScale(d.count)
+      )
+      .attr("stroke-width", 0.5)
+      .attr("stroke-dasharray", d=>{
+        if (d.event.indexOf("laneObject")!= -1){
+          return 0
+        }
+        else if(d.event == "freeToLane"){
+          return "0,"+rectHScale(d.count) + "," + rectHScale(d.count) + ", 0"
+        }
+        else if(d.event == "laneToFree"){
+          return rectHScale(d.count) + "," + rectHScale(d.count)
+        }
+        else{
+          return "0,"+rectHScale(d.count)/4 + "," + rectHScale(d.count)/2 + "," + rectHScale(d.count)/4
+        }
+        
+      })
+      .attr("stroke", d=> {
+        if ((d.event.indexOf("Lane")!= -1) | (d.event.indexOf("lane")!= -1)){
+          return "black"
+        }
+        else{
+          return "none"
+        }
+      })
+      
+      .on('mouseover',(event,d)=>{
+        // console.log(d)
+     
+        tooltip.css("display", "block");
+        tooltip.css("left", event.offsetX + 40);
+        tooltip.css("top", event.offsetY - 10);
+        cur.tooltipContent = "frame : " + d.frame + "<br>" + 
+        " label : "  + d.label_class + "<br>" 
+                    + "event : " + d.event + "<br>"
+                        + "count : " + d.count
+      })
+      .on("mouseout",()=>{
+        tooltip.css("display", "none");
+      })
 
     },
+    // plotEgoCar(){
+    //   this.egoFlag = true
+    // }
     // plotEgoCar(){
     //   let egoGroup = d3.select("#egoCar")
     //   let cur = this
@@ -461,6 +590,12 @@ export default {
     
       this.plotLineChart()
       this.plotStreamGraph()
+      // this.plotEventheatmap()
+      // let cur = this
+      // setTimeout(function(){
+      //   cur.plotEgoCar()
+      // },3000)
+      
       
     
     

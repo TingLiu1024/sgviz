@@ -1,45 +1,39 @@
 <template>
   
     <controlPanel
-      :width = 'sysWidth * 0.25'
-      :height = 'sysHeight * 0.37 - 2 * border'
+      :width = 'sysWidth * 0.3'
+      :height = 'sysHeight * 0.4 - 2 * border'
       :top = "border"
+      :left = "border"
+    />
+    <sgDetailView 
+      :width = 'sysWidth * 0.3'
+      :height = 'sysHeight * 0.4 - 2 * border'
+      :top = "sysHeight * 0.4 "
       :left = "border"
     />
     <beView 
-      :width = 'sysWidth * 0.25'
-      :height = 'sysHeight * 0.47'
-      :top = "sysHeight * 0.37 - border "
-      :left = "border"
-    />
-    <sgView v-if = "summaryViewState"
       :width = 'sysWidth * 0.3'
-      :height = 'sysHeight * 0.45'
+      :height = 'sysHeight * 0.4'
       :top = "border"
-      :left = " sysWidth * 0.25 + 2 * border"
+      :left = " sysWidth * 0.3 + 2 * border"
     />
-    <sgDetailView  
+    <sgView  v-if = "summaryViewState"
       :width = 'sysWidth * 0.3'
-      :height = 'sysHeight * 0.37 - 2 * border'
-      :top = "sysHeight * 0.45 +  border"
-      :left = "sysWidth * 0.25 + 2 * border"
+      :height = 'sysHeight * 0.4 - 2 * border'
+      :top = "sysHeight * 0.4 + 2 * border"
+      :left = "sysWidth * 0.3 + 2 * border"
     />
     <visualSummaryView v-if = "summaryViewState"
-      :width = 'sysWidth * 0.45 - 4 * border'
-      :height = 'sysHeight * 0.46'
+      :width = 'sysWidth * 0.4 - 4 * border'
+      :height = 'sysHeight * 1 - 2 * border'
       :top = "border"
-      :left = "sysWidth * 0.55 + 3 * border"
-    />
-    <graphSearchResult v-if = "summaryViewState"
-      :width = 'sysWidth * 0.45 - 4 * border'
-      :height = 'sysHeight * 0.36 - 2 * border'
-      :top = "sysHeight * 0.46 + border"
-      :left = "sysWidth * 0.55 + 3 * border"
+      :left = "sysWidth * 0.6 + 3 * border"
     />
     <topoSummary v-if = "summaryViewState"
-    :width = 'sysWidth * 1 - 2 * border'
-      :height = 'sysHeight * 0.2 +  border'
-      :top = "sysHeight * 0.82 + border"
+    :width = 'sysWidth * 1 - 4 * border'
+      :height = 'sysHeight * 0.2 + 3 * border'
+      :top = "sysHeight * 0.8 + 3 *border"
       :left = "border"
     />
 
@@ -53,7 +47,6 @@ import controlPanel from './components/controlPanel.vue'
 import sgDetailView from './components/sgDetailView.vue'
 import sgView from './components/sgView.vue'
 import visualSummaryView from './components/visualSummaryView.vue'
-import graphSearchResult from './components/graphSearchResult.vue'
 import topoSummary from './components/topoSummary.vue'
 import { mapState } from 'vuex'
 export default {
@@ -64,8 +57,7 @@ export default {
     sgDetailView,
     visualSummaryView,
     sgView,
-    topoSummary,
-    graphSearchResult
+    topoSummary
   },
   data(){
     return {

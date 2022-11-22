@@ -1,15 +1,27 @@
 <template>
   <div id="control" :style = "divCss">
-    <el-divider > Console </el-divider>
+    <el-divider > Image View </el-divider>
     <el-row> 
-      <el-select v-model="selectLogId" class="m-2" placeholder="Select" @change="updateLogId">
-    <el-option
+      <el-col :span = "10" >
+        <el-row align = "middle" justify = "center">
+           <label style="font-size:16px"> Choose the logId of video</label>
+           
+        </el-row>
+        
+        
+      </el-col>
+      <el-col :span = "14">
+        <el-select style="width:100%" v-model="selectLogId" class="m-2" placeholder="Select" @change="updateLogId">
+        <el-option
       v-for="(item,i) in logList"
       :key="i"
       :label="item"
       :value="item"
     />
   </el-select>
+      </el-col>
+      
+   
     </el-row>
     <img :src = "imgPath" :width="width">
     <!-- <img src = "../assets/images/ring_front_center/0ef28d5c-ae34-370b-99e7-6709e1c4b929/ring_front_center_315969338033780896.jpg"> -->
