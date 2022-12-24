@@ -18,8 +18,8 @@
       :top = "border"
       :left = " sysWidth * 0.25 + 2 * border"
     />
-    <sgDetailView  
-      :width = 'sysWidth * 0.3'
+    <sgDetailView 
+       :width = 'sysWidth * 0.3'
       :height = 'sysHeight * 0.37 - 2 * border'
       :top = "sysHeight * 0.45 +  border"
       :left = "sysWidth * 0.25 + 2 * border"
@@ -73,6 +73,7 @@ export default {
       // width:document.documentElement.clientWidth ,
       // height:document.documentElement.clientHeight,
       sysWidth: 2200,
+      // sysWidth: 2500,
       sysHeight: 1200,
       border: 10,
       // flag: false

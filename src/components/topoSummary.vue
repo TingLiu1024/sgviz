@@ -1,8 +1,20 @@
 <template>
   <div class="topo" :style="divCss">
     <el-divider>Topological Evolution View</el-divider>
-    <svg :width = "width" :height="eventHeatmapHeight"> 
+    <svg :width = "width" :height="(eventHeatmapHeight + legendHeight + timelineHeight)"> 
+      <g id = "topotimeline">
+        <path :d="timelinePath" stroke-width="1" stroke="grey" :transform="`translate(${marginLeft},0)`"> </path>
+        <g 
+        
+        id = "topoegoCar"
+        :transform="`translate(${3+marginLeft+timeScale(parseInt(currentTime))}, ${timelineHeight/2
+        })`"
+      >
+        <path :d="drawStar(8)" fill="red" fill-opacity="0.9" />
+      </g>
+      </g>
       <g id = "topoheatmap"></g>
+      <g id = "topolegend"></g>
 
     </svg>
     <div id="topoTip" :style="tooltip_css" v-html="tooltipContent"></div>
@@ -27,8 +39,11 @@ export default {
   data(){
     return {
       marginLeft:36,
-      marginTop:15,
+      marginTop:8,
       marginRight:15,
+      legendHeight:40,
+      timelineHeight:20,
+      DisappearOpactiy:0.5,
       streamColorDict:{
         "PEOPLE_notOnLane":"#FFCDBF", "PEOPLE_onLane":"#FF8680", "VEHICLE_onLane":"#1f78b4","VEHICLE_notOnLane":"#a6cee3",
         "PEOPLE": "#D25565" ,"VEHICLE":"#3E6D9C"
@@ -43,7 +58,7 @@ export default {
     }
   },
   computed:{
-    ...mapState(["currentEventData", "currentTrackingData"]),
+    ...mapState(["currentEventData", "currentTrackingData", "currentTime"]),
     timeRange() {
       if (this.currentTrackingData) {
         return d3.extent(
@@ -52,6 +67,11 @@ export default {
       } else {
         return [];
       }
+    },
+    timeScale(){
+      return  d3.scaleLinear()
+                .domain([this.timeRange[0], this.timeRange[1]])
+                .range([0, this.width - this.marginLeft]);
     },
     divCss() {
       return (
@@ -70,6 +90,10 @@ export default {
         "px;"
       );
     },
+    timelinePath(){
+      let cur = this
+      return d3.line()([[0, cur.timelineHeight/2], [cur.width, cur.timelineHeight/2]])
+    },
     eventHeatmapHeight(){
       let rectH = (this.width - this.marginRight - this.marginLeft) / (this.timeRange[1] + 1)
       // this.heatRectH = rectH
@@ -79,6 +103,21 @@ export default {
     }
   },
   methods:{
+    drawStar(r) {
+      const pi_val = Math.PI / 180;
+      const min_r = (r * Math.sin(18 * pi_val)) / Math.cos(36 * pi_val);
+      const A = [0, r],
+        B = [r * Math.cos(18 * pi_val), r * Math.sin(18 * pi_val)],
+        C = [r * Math.cos(54 * pi_val), -r * Math.sin(54 * pi_val)],
+        D = [-r * Math.cos(54 * pi_val), -r * Math.sin(54 * pi_val)],
+        E = [-r * Math.cos(18 * pi_val), r * Math.sin(18 * pi_val)],
+        F = [min_r * Math.cos(54 * pi_val), min_r * Math.sin(54 * pi_val)],
+        G = [min_r * Math.cos(18 * pi_val), -min_r * Math.sin(18 * pi_val)],
+        H = [0, -min_r],
+        K = [-min_r * Math.cos(18 * pi_val), -min_r * Math.sin(18 * pi_val)],
+        I = [-min_r * Math.cos(54 * pi_val), min_r * Math.sin(54 * pi_val)];
+      return d3.line()([A, F, B, G, C, H, D, K, E, I, A]);
+    },
     plotEventheatmap(){
       // window.evetData = this.currentEventData
       const countData = d3.rollups(this.currentEventData["object"], v => v.length, 
@@ -101,8 +140,12 @@ export default {
       // console.log(heatmapData)
       const rectH = this.eventHeatmapHeight / 14
       let cur = this
+      // const timelineGroup = d3.select("#topotimeline")
+      // .attr("transform", `translate(${cur.marginLeft }, ${cur.marginTop })`)
+      // timelineGroup.selectChildren().remove()
+
       const group = d3.select("#topoheatmap")
-      .attr("transform", `translate(${cur.marginLeft}, ${cur.marginTop })`)
+      .attr("transform", `translate(${cur.marginLeft }, ${cur.marginTop + cur.timelineHeight })`)
       group.selectChildren().remove()
       const heatmapYscale = d3.scalePoint().domain(["freeObjectDisappear",'laneObjectDisappear',
       "freeObjectAppear",'laneObjectAppear', "freeToLane", "laneToFree", "changeLane"
@@ -115,10 +158,11 @@ export default {
     //   d3.map(heatmapData, d=> d.count)
     // )]).range([0.3,1])
     let lineGen = d3.line()
+    
     group.append("g").selectAll(".borderPath").data([0,1,2,3,4,5,6,7,
     8,9,10,11,12,13,14]).enter().append("path")
     .attr('d', d => {
-        return lineGen([[0, d * rectH], [rectH * (cur.timeRange[1] + 1), d * rectH]])}
+        return lineGen([[0, d * rectH], [rectH * (cur.timeRange[1] + 2), d * rectH]])}
       )
       .attr("stroke-width", 1)
       .attr("stroke", "grey")
@@ -135,7 +179,7 @@ export default {
       .attr("opacity", d => {
         // console.log(d)
         if (d.event.indexOf("Disappear")!= -1){
-          return 0.5
+          return cur.DisappearOpactiy
         }
         else{
           return 1
@@ -143,7 +187,7 @@ export default {
       }
       // d => opacityScale(d.count)
       )
-      .attr("stroke-width", 0.5)
+      .attr("stroke-width", 1)
       .attr("stroke-dasharray", d=>{
         if (d.event.indexOf("laneObject")!= -1){
           return 0
@@ -182,7 +226,91 @@ export default {
       .on("mouseout",()=>{
         tooltip.css("display", "none");
       })
+      const legendGroup = d3.select("#topolegend").attr("transform", `translate(${cur.marginLeft}, ${cur.marginTop + cur.timelineHeight + cur.eventHeatmapHeight})`)
+      legendGroup.append("g").selectAll('.objectType').data(["VEHICLE", "PEOPLE"]).enter().append("circle")
+      .attr("cx", (d,i) => 200+ i *20)
+      .attr("cy", cur.legendHeight/2)
+      .attr('r', 6)
+      .attr("fill", d=>cur.streamColorDict[d] )
+      legendGroup.append("g").selectAll('.objectTypeText').data(["VEHICLE / PEOPLE"]).enter().append("text")
+      .text(d=>d)
+      
+      .attr("x", 200 - 140).attr("y", cur.legendHeight/2 + 5)
+        .attr("text-anchor", "left")
+        .style("opacity",0.95)
+        .style("font-size", "12px")
+        legendGroup.append("g").selectAll('.actionType').data(["Appear", "Disappear"]).enter().append("rect")
+      .attr("x", (d,i) => cur.width / 4 + i *20)
+      .attr("y", cur.legendHeight/2 - rectH / 2)
+      .attr('width', rectH)
+      .attr('height', rectH)
+      .attr("fill", cur.streamColorDict["VEHICLE"] )
+      .attr("opacity", d=>d == "Appear"?1:cur.DisappearOpactiy)
+      legendGroup.append("g").selectAll('.actionTypeText').data(["Appear / Disappear"]).enter().append("text")
+      .text(d=>d)
+      
+      .attr("x", cur.width / 4 - 140).attr("y", cur.legendHeight/2 + 5)
+        .attr("text-anchor", "left")
+        .style("opacity",0.95)
+        .style("font-size", "12px")
 
+        legendGroup.append("g").selectAll('.onLaneType').data(["free", "onLane"]).enter().append("rect")
+      .attr("x", (d,i) => cur.width / 2 + i *20)
+      .attr("y", cur.legendHeight/2 - rectH / 2)
+      .attr('width', rectH)
+      .attr('height', rectH)
+      .attr("fill", cur.streamColorDict["VEHICLE"] )
+      .attr("stroke-width", 2)
+      .attr("stroke", d=>d == "free"? "none":"black")
+      legendGroup.append("g").selectAll('.onLaneTypeText').data(["free / onLane"]).enter().append("text")
+      .text(d=>d)
+      
+      .attr("x", cur.width / 2 - 140).attr("y", cur.legendHeight/2 + 5)
+        .attr("text-anchor", "left")
+        .style("opacity",0.95)
+        .style("font-size", "12px")
+      
+        legendGroup.append("g").selectAll('.chanegLaneType').data(["freeToLane", "laneToFree", "changeLane"]).enter().append("rect")
+      .attr("x", (d,i) => cur.width / 4 * 3 + i *20)
+      .attr("y", cur.legendHeight/2 - rectH / 2)
+      .attr('width', rectH)
+      .attr('height', rectH)
+      .attr("fill", cur.streamColorDict["VEHICLE"] )
+      .attr("opacity", 1)
+      .attr("stroke", "black")
+      .attr("stroke-width", 2)
+      .attr("stroke-dasharray", d=>{
+        if(d == "freeToLane"){
+          return "0,"+rectH + "," + rectH + ", 0"
+        }
+        else if(d == "laneToFree"){
+          return rectH+ "," + rectH
+        }
+        else {
+          return "0,"+rectH/4 + "," + rectH/2 + "," + rectH/4
+        }
+      })
+      legendGroup.append("g").selectAll('.changeLaneTypeText').data(["freeToLane / laneToFree / changeLane"]).enter().append("text")
+      .text(d=>d)
+      .attr("x", cur.width / 4 * 3 - 240).attr("y", cur.legendHeight/2 + 5)
+        .attr("text-anchor", "left")
+        .style("opacity",0.95)
+        .style("font-size", "12px")
+        legendGroup.append("g").selectAll('.symbolSize').data(["small", "large"]).enter().append("rect")
+      .attr("x", (d,i) => cur.width -140+ i *20)
+      .attr("y", (d,i) =>  cur.legendHeight/2 - rectH / (2- i) / 2 )
+      .attr('width', (d,i) => rectH / (2- i))
+      .attr('height', (d,i) => rectH / (2- i))
+      .attr("fill", cur.streamColorDict["VEHICLE"] )
+      .attr("opacity", 1)
+      
+      
+      legendGroup.append("g").selectAll('.laneChangeTypeText').data(["Number of Occurrence"]).enter().append("text")
+      .text(d=>d)
+      .attr("x", cur.width  -300).attr("y", cur.legendHeight/2 + 5)
+        .attr("text-anchor", "left")
+        .style("opacity",0.95)
+        .style("font-size", "12px")
     },
   },
   mounted(){
@@ -191,6 +319,8 @@ export default {
   
 }
 </script>
+
+
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>

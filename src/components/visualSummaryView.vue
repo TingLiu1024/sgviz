@@ -102,6 +102,7 @@ export default {
       legendH:10,
       legendInterVal:10,
       yawList:[],
+      speedList:[],
       egoSize:10,
       streamKeys:[],
       tooltipContent:"",
@@ -176,6 +177,7 @@ export default {
       let scaleX = this.timeScale, scaleY = this.yScale
       let egoTrackingDataSorted  = d3.filter(this.currentTrackingData["trackingInfos"], d=> d.track_label_uuid == "ego")
       this.yawList = d3.map(egoTrackingDataSorted, d=>d.yawMod)
+      this.speedList = d3.map(egoTrackingDataSorted, d=>d.speed)
       // console.log(this.yawList)
       // console.log(d3.map(egoTrackingDataSorted, d=> d.speed))
       const speedMax = d3.max(d3.map(egoTrackingDataSorted, d=> d.speed))
@@ -246,7 +248,7 @@ export default {
             .attr("transform", `translate(0,0)`)
             .call(d3.axisLeft(this.yScale))
       
-      
+            let tooltip = $("#summaryTip");
         linesGroup.append("g").selectAll('.yawPath').data(linesData).enter().append("path").attr("d", d=>
         d3.line()( d3.map(d.plotPoints, function(dd) {
         return [scaleX(dd[0]), scaleY(dd[1])];
@@ -266,21 +268,53 @@ export default {
             //  .attr("stroke-opacity", 1)
              .attr("stroke", d=> d.is_intersection?this.intersectionStrokeColor:"none")
              .attr("fill-opacity", 0.8)
-            //  .on("mouseover", (e,d)=>{
-              // console.log(d)
-            //  })
+             .on("mousemove", (event)=>{
+             
+              tooltip.css("display", "block");
+                    tooltip.css("left", event.offsetX + 40);
+                    tooltip.css("top", event.offsetY - 10);
+                    // let mousex = d3.pointer(event, this)[0]
+                    // console.log(mousex)
+                    // window.mousex = mousex
+                    
+                    let invertedx = cur.timeScale.invert(event.offsetX - cur.marginLeft); //得到时间
+                    let currentT = parseInt(invertedx)
+                    
+                  let curYaw = !cur.yawList[currentT]?null:cur.yawList[currentT].toFixed(2)
+                  cur.tooltipContent = "Yaw" + " : " 
+                    + curYaw + "<br>"
+                        + "Timestamp : " + currentT
+             })
+             .on("mouseout",()=>{
+              tooltip.css("display", "none");
+             })
             //  speed
             linesGroup.append("g").selectAll('.speedPath').data([speedPol]).enter().append("path")
             .attr("d", d=>d3.line()(d)).attr("fill",this.speedFillColor).attr("opacity", 0.6)
+            .on("mousemove", (event)=>{
+             
+             tooltip.css("display", "block");
+                   tooltip.css("left", event.offsetX + 40);
+                   tooltip.css("top", event.offsetY - 10);
+            
+                   
+                   let invertedx = cur.timeScale.invert(event.offsetX - cur.marginLeft); //得到时间
+                   let currentT = parseInt(invertedx)
+                   
+                 let curSpeed = !cur.speedList[currentT]?null:cur.speedList[currentT].toFixed(2)
+                 cur.tooltipContent = "Speed" + " : " 
+                   + curSpeed + "<br>"
+                       + "Timestamp : " + currentT
+            })
+            .on("mouseout",()=>{
+             tooltip.css("display", "none");
+            })
             // d3.select("#svg").appendChild("#")
             
            
 
     },
     drawStar(r) {
-      // 五角星的10个点
-      // https://blog.csdn.net/M0_38082783/article/details/127682226
-
       const pi_val = Math.PI / 180;
       const min_r = (r * Math.sin(18 * pi_val)) / Math.cos(36 * pi_val);
       const A = [0, r],
@@ -398,7 +432,7 @@ export default {
 
                 let mousemove = function (event, d) {
                   let mousex = d3.pointer(event, this)[0]
-                    window.mousex = mousex
+                    
                     let invertedx = x.invert(mousex); //得到时间
                     let currentT = parseInt(invertedx)
                     
@@ -446,8 +480,7 @@ export default {
                     .on("mousemove", mousemove)
                     .on("mouseleave", mouseleave)
                     let legendG = group.append("g")
-               const legendText = ["PEOPLE_notOnLane", "PEOPLE_onLane",
-    "VEHICLE_onLane", "VEHICLE_notOnLane"]
+               const legendText = ["PEOPLE_notOnLane", "PEOPLE_onLane","VEHICLE_onLane", "VEHICLE_notOnLane"]
       legendG.selectAll('.legendR').data(legendText).enter().append("rect")
     .attr("width", cur.legendW)
     .attr("height", cur.legendH)

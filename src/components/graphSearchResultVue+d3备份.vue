@@ -1,132 +1,120 @@
 <template>
-  <div id="sgView" :style = "divCss">
-    <el-divider>Scene Graph View</el-divider>
-    <svg :width="svgWidth" :height="svgWidth" id ="sgsvg">
-     <path :d = "lineGenerator(lassoPol)" fill = "none" stroke = "grey" stroke-dasharray = "5,5"></path>
-      <g id ="dynamicGroup"> </g>
-    </svg>
-    <div id="sgTip" :style="tooltip_css" v-html="tooltipContent"></div>
+  <div id="graphSearchResult" :style="divCss">
+    <el-divider> Graph Search Result </el-divider>
+    <el-scrollbar>
+      <g >
+        <el-row v-for="(d, i) in searchMatchResult" :key="i">
+          <el-scrollbar>
+            <div
+              :style="'width:' +rectH * d['frames'].length +'px;height:'+ rectH+'px;border: 1px red solid;display: flex;flex-direction: row;'">
+            
+              <div :style="'height: '+rectH + 'px; width:'+ rectH +'px; border: 1px blue solid'" v-for="(dd, j) in d['frames']" :key="j" 
+              >
+                <svg width="100px" height="100px" :id="(d['logId'] +'_' +dd)" >
+                  {{dd}}
+                </svg>
+              </div>
+           
+             
+            </div>
+          </el-scrollbar>
+        </el-row>
+      </g>
+      <el-row>
+      
+      </el-row>
+      <el-row>
+        <el-card></el-card>
+      </el-row>
+      <el-row>
+        <el-card></el-card>
+      </el-row>
+      <el-row>
+        <el-card></el-card>
+      </el-row>
+      
+    </el-scrollbar>
   </div>
 </template>
 
 <script>
-
-
-import {mapState} from "vuex"
-import * as d3 from "d3"
-// import * as d3Lasso from "d3-lasso"
-import $ from "jquery"
+import {mapState} from 'vuex'
+import * as d3 from "d3";
 export default {
-  name: 'sgView',
+  name: "graphSearchResult",
   props: {
     //这两个属性从父组件继承
-    height:Number,
-    width:Number,
-    top:Number,
-    left:Number,
+    height: Number,
+    width: Number,
+    top: Number,
+    left: Number,
   },
-  data(){
+  data() {
     return {
-      fdgMargin: 20, // 用来调整比例尺保证结点都在图中
-      lastFdgLayout: [], //
-      // tooltip :$("#bevTip"),
-      
-      relStrokeColorDict:{"in":"#a6761d", "frontOrBehind":"#a65628", "leftOrRight":"#b3b3b3"},
-      tooltipContent:"",
-      lassoPol:[],
-      lassoStart:"",
-      lassoFlag:false,
-      lineGenerator:d3.line(),
-      tooltip_css:
-        "position: absolute;padding: 7px;font-size: 0.9em;pointer-events: none;background: #fff;border: 1px solid #ccc;" +
-        "border-radius: 4px;-moz-box-shadow: 3px 3px 10px 0px rgba(0, 0, 0, 0.25);display:none" +
-        "-webkit-box-shadow: 3px 3px 10px 0px rgba(0, 0, 0, 0.25);box-shadow: 3px 3px 10px 0px rgba(0, 0, 0, 0.25);display:none"
-    }
-    
+      rectH: 100,
+      sgMargin:5,
+      results: [{"logId": "log1", "frames":[1, 2, 3, 4] }, {"logId": "log2", "frames":[1, 2, 3, 4] }],
+    };
   },
-
-  computed:{
-    ...mapState(["currentSgData"]),
-    ...mapState([ "laneColor", "vehColor", "peoColor", "egoColor","mapCenter","mapRange","currentTime"]),
-    divCss(){
-        return "position: absolute; border: 0px solid black;" +  
-              "height:" + this.height + "px;" +
-              "width:" + this.width + "px;" +
-              "left:" + this.left + "px;" +
-              "top:" + this.top + "px;" 
+  computed: {
+    ...mapState([ "laneColor", "vehColor", "peoColor", "egoColor", "searchSgData", "searchMatchResult"]),
+    divCss() {
+      return (
+        "position: absolute; border: 0px solid black;" +
+        "height:" +
+        this.height +
+        "px;" +
+        "width:" +
+        this.width +
+        "px;" +
+        "left:" +
+        this.left +
+        "px;" +
+        "top:" +
+        this.top +
+        "px;"
+      );
     },
-    svgWidth() {
-      return Math.min(this.height, this.width) - 10;
-    },
-    scaleX(){
-      return d3.scaleLinear().domain([this.mapCenter[0] - this.mapRange - this.fdgMargin,
-      this.mapCenter[0] + this.mapRange + this.fdgMargin])
-                .range([0, this.svgWidth]);
-    },
-    scaleY(){
-      return d3.scaleLinear().domain([this.mapCenter[1] - this.mapRange - this.fdgMargin,
-      this.mapCenter[1] + this.mapRange + this.fdgMargin])
-                .range([this.svgWidth,0]);
-    }
-  },
-  mounted(){
-    this.plotOneStampFdg(0, this.currentSgData)
+   
   },
   methods:{
-    inside(point, vs) {
-    // ray-casting algorithm based on
-    // https://wrf.ecse.rpi.edu/Research/Short_Notes/pnpoly.html/pnpoly.html
-    
-    var x = point[0], y = point[1];
-    
-    var inside = false;
-    for (var i = 0, j = vs.length - 1; i < vs.length; j = i++) {
-        var xi = vs[i][0], yi = vs[i][1];
-        var xj = vs[j][0], yj = vs[j][1];
+    // itemMouse( d, dd) {
+    //   console.log(d, dd)
+    // },
+    plotOneStampFdg(dynamicGroup, tsp , data) {
+      
+      if(!data){
+          return []
+      }
+  
+      let cur = this
+      
         
-        var intersect = ((yi > y) != (yj > y))
-            && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
-        if (intersect) inside = !inside;
-    }
-    
-    return inside;
-},
-     plotOneStampFdg(tsp, data) {
-      window.sgData = data
-        if(!data){
-            return []
-        }
-        // function lassoStart(){
-        //   console.log('lasso start')
-        // }
-        let cur = this
-      let dynamicGroup = d3.select("#dynamicGroup")
-      
-      
-      //   let lasso = d3Lasso.lasso()
-      //   .closePathSelect(true)
-      //       .closePathDistance(100)
-      //       .on("start", lassoStart)
-      // dynamicGroup.call(lasso);
+      let lastFdgLayout = []
+     
+      const graph = data[tsp.toString()]
+      let xRange = d3.extent(d3.map(graph.nodes, d=> d.cityX))
+      let yRange = d3.extent(d3.map(graph.nodes, d=> d.cityY))
+      let mapRange = d3.max([yRange[1]- yRange[0], xRange[1] - xRange[0]]) / 2
+      let mapCenter = [ d3.mean(xRange), d3.mean(yRange)]
+      let scaleFdgX = d3.scaleLinear().domain([mapCenter[0] - mapRange, mapCenter[0] + mapRange])
+                .range([0 + cur.sgMargin, cur.rectH - cur.sgMargin]),
+          scaleFdgY = d3.scaleLinear().domain([mapCenter[1] - mapRange, mapCenter[1] + mapRange])
+                .range([cur.rectH - cur.sgMargin, 0 + cur.sgMargin]), 
+          laneColor = this.laneColor, vehColor = this.vehColor, peoColor = this.peoColor, egoColor = this.egoColor
+      let maxCityX =  mapCenter[0] + mapRange,
+          minCityX = mapCenter[0] - mapRange,
+          maxCityY = mapCenter[1] + mapRange,
+          minCityY = mapCenter[1] - mapRange
 
-      
-      let lastFdgLayout = this.lastFdgLayout
-      let scaleFdgX = this.scaleX, scaleFdgY = this.scaleY, laneColor = this.laneColor, 
-        vehColor = this.vehColor, peoColor = this.peoColor, egoColor = this.egoColor
-      let maxCityX =  this.mapCenter[0] + this.mapRange,
-      minCityX = this.mapCenter[0] - this.mapRange,
-      maxCityY = this.mapCenter[1] + this.mapRange,
-      minCityY = this.mapCenter[1] - this.mapRange
-
-                const graph = data[tsp.toString()]
     
                 // console.log(graph)
-                let lastObjs = []
+      let lastObjs = []
                 
-                if (lastFdgLayout) {
-                    lastObjs = d3.map(lastFdgLayout, d => d.track_label_uuid)
-                    // console.log(lastObjs)
-                }
+      if (lastFdgLayout) {
+          lastObjs = d3.map(lastFdgLayout, d => d.track_label_uuid)
+          // console.log(lastObjs)
+      }
                 
                 graph.nodes.forEach((d) => {
                     // 车道固定位置， 已有位置按原位置分配， 没有的若能匹配到车道，则初始位置为对应车道，否则，按本身的地理位置分配
@@ -182,9 +170,9 @@ export default {
                     // 连接力
                     .force("link", d3.forceLink(graph.links)
                         .id(d => d.track_label_uuid) 	// 每个节点的id的获取方式
-                        .strength(1)) // 
+                        .strength(1).distance(10))
                     // 万有引力
-                    .force("charge", d3.forceManyBody().strength(-3).distanceMax(30))
+                    .force("charge", d3.forceManyBody().strength(-3).distanceMax(10))
 
                 // 定义人物节点之间连线的信息
                 let link = dynamicGroup
@@ -196,34 +184,8 @@ export default {
                     // .join("line")
                     
                     .attr("stroke-opacity", 1)
-                    .attr("stroke-width", 3) // 连线粗细通过线的value计算
-                    .attr("stroke", 
-                    "#a65628"
-                    // d => cur.relStrokeColorDict[d["relation"]]
-                    )
-                    .on('mouseover', function (event, d) {
-                      
-                      let tooltip = $("#sgTip");
-                      // console.log('tooltip', d)
-                      cur.tooltipContent =   "<p> source: " + d.source.track_label_uuid + "<br>" + 'target: '+ 
-                        d.target.track_label_uuid +"<br>" +
-                         'relation: ' + d.relation + "</p>" ;
-                      tooltip.css("display", "block");
-                      tooltip.css("left", event.offsetX + 40);
-                      tooltip.css("top", event.offsetY - 10);
-                      
-                      
-                    })
-                    .on('mouseout', function () {
-                      let tooltip = $("#sgTip");
-                      tooltip.css("display", "none");
-                      
-
-
-                    })
-                   
-
-
+                    .attr("stroke-width", 1) // 连线粗细通过线的value计算
+                    .attr("stroke", "#a65628")
 
                 let node = dynamicGroup
                     .selectAll(".circle").data(graph.nodes).enter()
@@ -235,13 +197,13 @@ export default {
                     .attr("d", d3.symbol()
                         .size(function (d) {
                             if (d.label_class == "LANE") {
-                                return 300
+                                return 30
                             }
                             else if (d.label_class == "PEOPLE") {
-                                return 100
+                                return 10
                             }
                             else {
-                                return 150
+                                return 15
                             }
                         })
                         .type(
@@ -280,27 +242,7 @@ export default {
                             .on("drag", dragged)
                             .on("end", dragended)
                     )
-                    .on('mouseover', function (event, d) {
-                      let tooltip = $("#sgTip");
-                      // console.log('tooltip', d)
-                      cur.tooltipContent =   "<p> id: " + d.track_label_uuid + "<br>" + 'class: ' + d.label_class + "</p>" ;
-                      tooltip.css("display", "block");
-                      tooltip.css("left", event.offsetX + 40);
-                      tooltip.css("top", event.offsetY - 10);
-                      if (d.label_class == "LANE"){
-                        cur.$store.commit("updateSgCurrentOverLane", d.track_label_uuid)
-                      }
-                      else if(d.label_class == "VEHICLE"){
-                        cur.$store.commit("updateSgCurrentOverCar", d.track_label_uuid)
-                      }
-                    })
-                    .on('mouseout', function () {
-                      let tooltip = $("#sgTip");
-                      tooltip.css("display", "none");
-                      cur.$store.commit("updateSgCurrentOverLane", "100")
-                      cur.$store.commit("updateSgCurrentOverCar", "100")
-
-                    })
+                   
 
                 // node.append("title").text(d => d.id);
                 // 定义simulation内部计时器tick每次结束时的动作
@@ -314,8 +256,7 @@ export default {
 
                     // 每次tick计时到时，节点的响应动作
                     node
-                        // .attr("cx", d => d.x)
-                        // .attr("cy", d => d.y);
+
                         .attr("transform", function (d) { return "translate(" + d.x + "," + d.y + ")"; })
 
                 });
@@ -343,55 +284,54 @@ export default {
                     event.subject.fy = null;
                 }
 
-                d3.select("#sgsvg").on("mousedown",(event)=>{
-        cur.lassoFlag = true
-        cur.lassoPol = []
-        // console.log(event)
-        cur.lassoStart = [event.offsetX, event.offsetY]
-        cur.lassoPol.push([event.offsetX, event.offsetY])
-      })
-      .on("mousemove", (event)=>{
-        if( cur.lassoFlag){
-
-          cur.lassoPol.push([event.offsetX, event.offsetY])
-        }
-        
-      })
-      .on("mouseup", ()=>{
-        cur.lassoFlag = false
-        cur.lassoPol.push(cur.lassoStart)
-        let lassoEle = {"nodes":[], "edges": []}
-        node.selectChildren().each(d=>{
-          // console.log(d)
-          if (cur.inside([d.x, d.y], cur.lassoPol)){
-            lassoEle["nodes"].push(d)
-            // console.log(d)
-          } 
-        })
-        dynamicGroup.selectAll("line").each(d=>{
-          // console.log(d)
-          if (cur.inside([d.source.x, d.source.y], cur.lassoPol) &
-          cur.inside([d.target.x, d.target.y], cur.lassoPol)){
-            lassoEle["edges"].push(d)
-            // console.log(d)
-          } 
-        })
-        // console.log(lassoEle)
-        cur.$store.commit('updateSgBrushData', lassoEle)
-      })
+   
                 return graph.nodes
+    },
+    
 
-            }
   },
   watch: {
-    currentTime: function() {
-      this.lastFdgLayout = this.plotOneStampFdg(this.currentTime, this.currentSgData)
-    }
+    // searchSgData: function(){
+    //   console.log(this.searchSgData)
+    //   console.log(this.searchMatchResult)
+    //   let cur = this
+    //   cur.searchMatchResult.forEach((logRes)=>{
+    //     let logId_ = logRes["logId"]
+    //     logRes["frames"].forEach(frm =>{
+    //       let dynamicGroup = d3.select("#" + logId_ + '_' + frm)
+    //       // let dynamicGroup = document.getElementById(logId_ + '_' + frm)
+    //       // let dynamicGroup = d3.select('#3138907e-1f8a-362f-8f3d-773f795a0d01_1')
+    //       cur.plotOneStampFdg(dynamicGroup, frm , cur.searchSgData[logId_])
+    //     })
+    //   })
+    // },
+    // searchMatchResult: function() {
+      
+    // }
   },
-}
+  mounted() {
+    console.log(this.searchSgData)
+      console.log(this.searchMatchResult)
+      let cur = this
+      if (cur.searchMatchResult.length >0 ){
+        cur.searchMatchResult.forEach((logRes)=>{
+        let logId_ = logRes["logId"]
+        logRes["frames"].forEach(frm =>{
+          let dynamicGroup = d3.select("#" + logId_ + '_' + frm)
+          // let dynamicGroup = document.getElementById(logId_ + '_' + frm)
+          // let dynamicGroup = d3.select('#3138907e-1f8a-362f-8f3d-773f795a0d01_1')
+          cur.plotOneStampFdg(dynamicGroup, frm , cur.searchSgData[logId_])
+        })
+      })
+      }
+      
+      
+      
+      
+    },
+};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
 </style>

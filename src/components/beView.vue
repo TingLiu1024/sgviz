@@ -208,15 +208,18 @@ export default {
       return [];
     },
     egoData() {
+      let res = []
       if (this.currentTrackingData) {
-        return d3.filter(
+        
+        res = d3.filter(
           this.currentTrackingData["trackingInfos"],
           d =>
             (d.frame == this.currentTimestamp) & (d.track_label_uuid == "ego")
         );
-      } else {
-        return [];
-      }
+        this.$store.commit("updateCurrentEgoData", res[0])
+      } 
+      
+      return res;
     },
     timeRange() {
       if (this.currentTrackingData) {
