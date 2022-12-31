@@ -15,7 +15,7 @@ from time import ctime, sleep
 from func_timeout import func_set_timeout
 
 
-@func_set_timeout(10)
+@func_set_timeout(5)
 def subgraph_is_isomorphic(cmp, frame):
     if cmp.subgraph_is_isomorphic():
         # print(frame)
