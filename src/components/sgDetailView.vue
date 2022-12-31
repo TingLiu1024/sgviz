@@ -302,8 +302,8 @@ export default {
         .then((response) => {
           let data = response.data
           // console.log(data)
-          console.log('request', request)
-          console.log('result', data["searchResults"])
+          // console.log('request', request)
+          // console.log('result', data["searchResults"])
           let tmp = data["searchResults"].filter(d => Object.values(d)[0].length >0)
           let res = []
           tmp.forEach(d=>{
@@ -326,8 +326,8 @@ export default {
     changeConsideration(d, str_){
       // console.log(str_)
       let checkflag = d[str_]
-      d = Object.assign(d, {str_:!checkflag})
-      // console.log(d)
+      // d = Object.assign(d, {str_:!checkflag})
+      console.log(d)
       // 不考虑结点时删除对应边
       let cur = this
       // console.log(typeof(str_) )
@@ -340,6 +340,15 @@ export default {
             // console.log(dd)
           }
         })
+      }
+      // 有向图双向边互相绑定
+      if(Object.keys(d).includes("source") & str_ == "consider"){
+        cur.sgBrushGraph["edges"].forEach(dd=>{
+          if( dd.target.track_label_uuid == d.source.track_label_uuid & dd.source.track_label_uuid == d.target.track_label_uuid ){
+            dd = Object.assign(dd, {[str_]:checkflag})
+          }
+        })
+
       }
       
       // console.log(this.sgBrushGraph)
