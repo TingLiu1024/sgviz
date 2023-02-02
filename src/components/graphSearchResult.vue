@@ -11,6 +11,7 @@
               <div :style="'height: '+rectH + 'px; width:'+ rectH +'px; border: 1px grey solid'" v-for="(dd, j) in d['frames']" :key="j" 
               @mouseover="itemMouse('over', d['logId'], dd, $event)"
               @mouseout="itemMouse('out', d['logId'], dd, $event)"
+              @click="changeToFrame(d['logId'], dd)"
               >
                 <svg width="100px" height="100px" :id="('svg'+d['logId'] +'_' +dd)" >
                  
@@ -82,6 +83,13 @@ export default {
     // itemMouse( d, dd) {
     //   console.log(d, dd)
     // },
+    changeToFrame(logId_, frm){
+      console.log('click', logId_, frm)
+      this.$store.commit('updateLogId', logId_)
+      // this.$store.dispatch('getDataset', logId_)
+      this.$store.commit('updateTime', parseInt(frm))
+
+    },
   sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
   },

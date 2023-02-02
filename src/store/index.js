@@ -8,7 +8,7 @@ import logListDict from "../../public/logList.json"
 
 export default createStore({
   state: {
-    currentLogId: "",
+    currentLogId: "0ef28d5c-ae34-370b-99e7-6709e1c4b929",
     mapAll:{"PIT" : mapPIT, "MIA": mapMIA},
     laneColor:"#716e77",
     vehColor:"#3E6D9C", 
@@ -23,6 +23,7 @@ export default createStore({
     summaryViewState: false,
     sgCurrentOverLane:"100",//记录sgview mouseover的道路
     sgCurrentOverCar:"100",
+    sgCurrentOverPeo:"100",
     currentEventData:"",
     sgBrushGraph:{"nodes":[],"edges":[]},
     currentEgoData:"",
@@ -64,6 +65,9 @@ export default createStore({
    },
    updateSgCurrentOverCar(state, carId){
     state.sgCurrentOverCar = carId
+   },
+   updateSgCurrentOverPeo(state, peoId){
+    state.sgCurrentOverPeo = peoId
    },
    updateSgBrushData(state, data){
     // 定义子图匹配调节

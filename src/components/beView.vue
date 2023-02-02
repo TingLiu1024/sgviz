@@ -49,10 +49,50 @@
           :cx="scaleX(d.cityX)"
           :cy="scaleY(d.cityY)"
           r="3"
-          :fill="peoColor"
+          :fill="(sgCurrentOverPeo == d.track_label_uuid)?peoColor:'white'"
+          :stroke="peoColor"
+          stroke-width="1.5"
+          :fill-opacity="(sgCurrentOverPeo == d.track_label_uuid)?0.7:0"
           @mouseover="itemMouse('over', d, $event)"
           @mouseout="itemMouse('out', d, $event)"
         />
+      </g>
+      <!-- legend -->
+      <g id ="lineLegend" :transform ="`translate(${svgWidth - marginLeft},${marginTop})`"> 
+        <g id = "lineLegendTextBev"></g>
+
+        <g :transform ="`translate(${legendW/2},${0 + 1 * (legendH + legendInterVal)  + legendH / 2})`"
+      >
+        <path :d="drawStar(egoSize+2)" :fill="egoColor" fill-opacity="0.9" />
+      </g>
+        <circle
+          :cx="legendW/2"
+          :cy="0 + 2 * (legendH + legendInterVal)  + legendH / 2"
+          r="5"
+          fill="none"
+          :stroke="peoColor"
+          stroke-width="1.5"
+        />
+        
+        <rect :width="legendW"
+            :height="legendH"
+            x="0"
+            :y="0 +  3* (legendH + legendInterVal)"
+            fill="none"
+            :stroke = "vehColor"
+            stroke-width = "2"
+        ></rect>
+
+        <rect :width="legendW"
+            :height="legendH"
+            x="0"
+            :y="0 +  4* (legendH + legendInterVal)"
+            fill="none"
+            :stroke = "laneColor"
+            stroke-width = "2"
+        ></rect>
+        
+
       </g>
     </svg>
 
@@ -101,6 +141,11 @@ export default {
 
       nIntervId: "", // 控制播放
       playInterval: 100,
+      legendW:15,
+      legendH:10,
+      legendInterVal:10,
+      marginLeft:85,
+      marginTop:350,
       egoSize: 6,
       lineGenerator: d3.line(),
       tooltipContent: "",
@@ -111,7 +156,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(["currentLogId","sgCurrentOverLane","sgCurrentOverCar"]),
+    ...mapState(["currentLogId","sgCurrentOverLane","sgCurrentOverCar", "sgCurrentOverPeo"]),
     ...mapState(["currentTrackingData"]),
     ...mapState(["mapAll", "laneColor", "vehColor", "peoColor", "egoColor","mapCenter","mapRange"]),
     // ...mapGetters(["currentCity"]),
@@ -257,7 +302,18 @@ export default {
       }
     }
   },
-  mounted() {},
+  mounted() {
+    const legendG = d3.select('#lineLegendTextBev')
+    let cur = this
+    legendG.selectChildren().remove()
+      legendG.selectAll(".lineText").data(["EGO", "PEOPLE", "VEHICLE", "LANE"]).enter()
+      .append("text").attr("x",30).attr("y", (d,i)=>{return 10 + (i+1) * (cur.legendInterVal+
+        cur.legendH)}).text(d=>d)
+        .attr("text-anchor", "left")
+        .style("opacity",0.95)
+        .style("font-size", "12px")
+
+  },
   watch: {
     currentTimestamp: function() {
       if (this.currentTimestamp == this.timeRange[1]) {

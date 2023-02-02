@@ -11,7 +11,7 @@
         
       </el-col>
       <el-col :span = "14">
-        <el-select style="width:100%" v-model="selectLogId" class="m-2" placeholder="Select" @change="updateLogId">
+        <el-select style="width:100%" v-model="selectLogId" class="m-2" placeholder="Select" >
         <el-option
       v-for="(item,i) in logList"
       :key="i"
@@ -46,26 +46,43 @@ export default {
     left:Number,
   },
   data(){
-    let logId = "0ef28d5c-ae34-370b-99e7-6709e1c4b929"
-    this.$store.commit('updateLogId', logId)
-    this.$store.dispatch('getDataset', logId)
-    const imageType = "ring_front_center"
+    // let logId = "0ef28d5c-ae34-370b-99e7-6709e1c4b929"
     
-    let files = logToImgList[logId]
-    files.sort()
+    // // this.$store.commit('updateLogId', logId)
+    // // this.$store.dispatch('getDataset', logId)
+    
+    
+    // let files = logToImgList[logId]
+    // files.sort()
       
 
     return {
-      selectLogId:logId,
-      imageType: imageType,
-      imgList:files,
+      // selectLogId:logId,
+      imageType: "ring_front_center",
+      imgList:[],
       logToImgList:logToImgList
 
     }
   },
   computed:{
     ...mapGetters(["logList"]),
+    ...mapState(["currentLogId"]),
     ...mapState(["currentTime"]),
+    selectLogId:{
+      get(){
+        this.$store.dispatch('getDataset',this.$store.state.currentLogId)
+        this.updateImgList()
+        return this.$store.state.currentLogId
+        
+      },
+      set(value){
+        this.$store.commit('updateLogId', value)
+        this.updateImgList()
+      this.$store.dispatch('getDataset',value)
+
+      }
+
+    },
     divCss(){
         return "position: absolute; border: 0px solid black;" +  
               "height:" + this.height + "px;" +
@@ -79,14 +96,22 @@ export default {
     }
       
   },
+  watch: {
+    // currentLogId: function() {
+    //   this.selectLogId = this.currentLogId
+    // }
+    
+  },
   methods:{
-    updateLogId(){
+    updateImgList(){
       // this.logId = this.selectLogId
-      this.$store.commit('updateLogId', this.selectLogId)
-      this.$store.dispatch('getDataset',this.selectLogId)
-      let files = this.logToImgList[this.selectLogId]
-      files.sort()
-      this.imgList = files
+      // this.$store.commit('updateLogId', this.selectLogId)
+      // this.$store.dispatch('getDataset',this.selectLogId)
+      let files = this.logToImgList[this.$store.state.currentLogId]
+        files.sort()
+        this.imgList = files
+      
+      
 
     }
   }

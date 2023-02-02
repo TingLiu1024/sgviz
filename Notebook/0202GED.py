@@ -68,32 +68,34 @@ uniqueFrame.reset_index(drop=True, inplace= True)
 print(len(uniqueFrame))
 unique_frame_dict = uniqueFrame[["same_frame", "logId"]].to_dict(orient="index")
 
-def get_distances(source_index, allGraph, unique_frame_dict):
+def get_distances(source_index, allGraph, unique_frame_dict, missingFrameDicct):
     distance_dict = {}
     frame_dictA = unique_frame_dict[source_index]
     graph_dictA = allGraph[frame_dictA["logId"]][str(frame_dictA["same_frame"])]
-    for target_index in range(len(unique_frame_dict)):
+    for target_index in missingFrameDicct[str(source_index)]:
         frame_dictB = unique_frame_dict[target_index]
         graph_dictB = allGraph[frame_dictB["logId"]][str(frame_dictB["same_frame"])]
         try:   
-            distance = nx.graph_edit_distance(graph_dictA["edgesGraph"], graph_dictB["edgesGraph"], node_match = nodeM, edge_match = edgeM, roots = ("ego", "ego"),  timeout = 2) + \
+            distance = nx.graph_edit_distance(graph_dictA["edgesGraph"], graph_dictB["edgesGraph"], node_match = nodeM, edge_match = edgeM, roots = ("ego", "ego"),  timeout = 10) + \
         abs(graph_dictA['freeVeh'] - graph_dictB['freeVeh']) + abs(graph_dictA['freePeo'] - graph_dictB['freePeo'])
         except:
             distance = None
         distance_dict[target_index] = distance
     res = {source_index: distance_dict}
-    jsonWriter = open("../public/procressData/distance/"+str(source_index)+".json", 'w')
+    jsonWriter = open("../public/procressData/distance_recal/"+str(source_index)+".json", 'w')
 
     jsonWriter.write(json.dumps(res))
     jsonWriter.close()
     return {source_index: distance_dict}
 if __name__ == '__main__':
-    indexes = json.load(open("unCalIndex.json"))
+    missingDict = json.load(open("unCalFrame.json"))
+    indexes = missingDict.keys()
+    indexes = [int(i) for i in indexes]
     # print(indexes[0:10])
     num_cores = int(mp.cpu_count())
     print(num_cores)      
     pool = mp.Pool(num_cores )
-    results = [pool.apply_async(get_distances, args=(source_index_, allGraph, unique_frame_dict)) for source_index_ in indexes]
+    results = [pool.apply_async(get_distances, args=(source_index_, allGraph, unique_frame_dict, missingDict)) for source_index_ in indexes]
     results = [p.get() for p in results]
 
     # jsonWriter = open("../public/procressData/distance/"+str(index_start)+"_" + str(index_end)+".json", 'w')

@@ -105,6 +105,7 @@ export default {
       speedList:[],
       egoSize:10,
       streamKeys:[],
+      streamMargin: 10,
       tooltipContent:"",
       tooltip_css:
         "position: absolute;padding: 7px;font-size: 0.9em;pointer-events: none;background: #fff;border: 1px solid #ccc;" +
@@ -389,6 +390,7 @@ export default {
       
 
                 let countData = this.getStreamGraphData(this.currentTrackingData["trackingInfos"])
+                window.countData = countData
                 let stackedData = countData["stack"], res = countData["res"]
 
                 let x = this.timeScale
@@ -397,15 +399,21 @@ export default {
                 //     .attr('transform', `translate(${0},${this.streamHeight + this.lineChartHeight - 20})`)
                 //     .call(d3.axisBottom(x).tickSize(2))//.tickValues(date).tickSize(2)
                 //     .style('font-size', '0.5rem')
+                // let maxY = 0
+                // d3.map(this.streamKeys, function(key){
+                //     let maxY_ = d3.max(res, d=>d[key])
+                //     maxY = Math.max(maxY, maxY_)
+                // })
+
                 let maxY = 0
-                d3.map(this.streamKeys, function(key){
-                    let maxY_ = d3.max(res, d=>d[key])
+                d3.map(stackedData, function(sub){
+                    let maxY_ = d3.max(sub, d=>d[1])
                     maxY = Math.max(maxY, maxY_)
                 })
                 // console.log(maxY)
                 let y = d3.scaleLinear()
-                    .domain([-maxY, maxY])
-                    .range([ 0, this.streamHeight])
+                    .domain([-maxY, maxY ])
+                    .range([ 0 + this.streamMargin , this.streamHeight - this.streamMargin])
 
                 
                    

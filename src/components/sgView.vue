@@ -4,6 +4,38 @@
     <svg :width="svgWidth" :height="svgWidth" id ="sgsvg">
      <path :d = "lineGenerator(lassoPol)" fill = "none" stroke = "grey" stroke-dasharray = "5,5"></path>
       <g id ="dynamicGroup"> </g>
+      <!-- legend -->
+      <g id ="lineLegendSg" :transform ="`translate(${svgWidth - marginLeft},${marginTop})`"> 
+        <g id = "lineLegendTextSg"></g>
+
+        <g :transform ="`translate(${legendW/2},${0 + 1 * (legendH + legendInterVal)  + legendH / 2})`"
+      >
+        <path :d="drawStar(egoSize)" :fill="egoColor" fill-opacity="0.9" />
+      </g>
+        <circle
+          :cx="legendW/2"
+          :cy="0 + 2 * (legendH + legendInterVal)  + legendH / 2"
+          r="5"
+          :fill="peoColor"
+          
+        />
+        <g :transform ="`translate(${legendW/2},${0 + 3 * (legendH + legendInterVal)  + legendH / 2})`"
+      >
+        <path :d="drawCross(vehSize)" :fill="vehColor"  />
+      </g>
+        
+
+        <rect :width="legendW"
+            :height="legendH"
+            x="0"
+            :y="0 +  4* (legendH + legendInterVal)"
+            :fill="laneColor"
+            fill-opacity="0.7"
+            
+        ></rect>
+        
+
+      </g>
     </svg>
     <div id="sgTip" :style="tooltip_css" v-html="tooltipContent"></div>
   </div>
@@ -30,7 +62,13 @@ export default {
       fdgMargin: 20, // 用来调整比例尺保证结点都在图中
       lastFdgLayout: [], //
       // tooltip :$("#bevTip"),
-      
+      legendW:15,
+      legendH:10,
+      legendInterVal:10,
+      marginLeft:85,
+      marginTop:350,
+      egoSize:9,
+      vehSize:100,
       relStrokeColorDict:{"in":"#a6761d", "frontOrBehind":"#a65628", "leftOrRight":"#b3b3b3"},
       tooltipContent:"",
       lassoPol:[],
@@ -71,6 +109,18 @@ export default {
   },
   mounted(){
     this.plotOneStampFdg(0, this.currentSgData)
+    
+    const legendG = d3.select('#lineLegendTextSg')
+    let cur = this
+    legendG.selectChildren().remove()
+      legendG.selectAll(".lineText").data(["EGO", "PEOPLE", "VEHICLE", "LANE"]).enter()
+      .append("text").attr("x",30).attr("y", (d,i)=>{return 10 + (i+1) * (cur.legendInterVal+
+        cur.legendH)}).text(d=>d)
+        .attr("text-anchor", "left")
+        .style("opacity",0.95)
+        .style("font-size", "12px")
+
+
   },
   methods:{
     inside(point, vs) {
@@ -293,12 +343,16 @@ export default {
                       else if(d.label_class == "VEHICLE"){
                         cur.$store.commit("updateSgCurrentOverCar", d.track_label_uuid)
                       }
+                      else if(d.label_class == "PEOPLE"){
+                        cur.$store.commit("updateSgCurrentOverPeo", d.track_label_uuid)
+                      }
                     })
                     .on('mouseout', function () {
                       let tooltip = $("#sgTip");
                       tooltip.css("display", "none");
                       cur.$store.commit("updateSgCurrentOverLane", "100")
                       cur.$store.commit("updateSgCurrentOverCar", "100")
+                      cur.$store.commit("updateSgCurrentOverPeo", "100")
 
                     })
 
@@ -381,7 +435,33 @@ export default {
       })
                 return graph.nodes
 
-            }
+            },
+        drawStar(r) {
+      // 五角星的10个点
+      // https://blog.csdn.net/M0_38082783/article/details/127682226
+
+      const pi_val = Math.PI / 180;
+      const min_r = (r * Math.sin(18 * pi_val)) / Math.cos(36 * pi_val);
+
+      const A = [0, r],
+        B = [r * Math.cos(18 * pi_val), r * Math.sin(18 * pi_val)],
+        C = [r * Math.cos(54 * pi_val), -r * Math.sin(54 * pi_val)],
+        D = [-r * Math.cos(54 * pi_val), -r * Math.sin(54 * pi_val)],
+        E = [-r * Math.cos(18 * pi_val), r * Math.sin(18 * pi_val)],
+        F = [min_r * Math.cos(54 * pi_val), min_r * Math.sin(54 * pi_val)],
+        G = [min_r * Math.cos(18 * pi_val), -min_r * Math.sin(18 * pi_val)],
+        H = [0, -min_r],
+        K = [-min_r * Math.cos(18 * pi_val), -min_r * Math.sin(18 * pi_val)],
+        I = [-min_r * Math.cos(54 * pi_val), min_r * Math.sin(54 * pi_val)];
+      return this.lineGenerator([A, F, B, G, C, H, D, K, E, I, A]);
+    },
+    drawCross( size) {
+    const r = Math.sqrt(size / 5) / 2;
+    const A = [-3 * r, -r], B = [-r,-r], C = [-r, -3 * r], C1 = [r, -3 * r],D = [r, -r], E = [3 * r, -r], F = [3 * r, r], G = [r, r],
+    H = [r, 3* r], I = [-r, 3 * r], J = [-r, r], K = [-3 * r, r]
+    return this.lineGenerator([A, B, C, C1, D, E, F, G, H, I, J, K, A]);
+  
+  }
   },
   watch: {
     currentTime: function() {

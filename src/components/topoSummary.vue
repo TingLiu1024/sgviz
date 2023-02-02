@@ -7,7 +7,7 @@
         <g 
         
         id = "topoegoCar"
-        :transform="`translate(${3+marginLeft+timeScale(parseInt(currentTime))}, ${timelineHeight/2
+        :transform="`translate(${marginLeft+timeScale(parseInt(currentTime))}, ${timelineHeight/2
         })`"
       >
         <path :d="drawStar(8)" fill="red" fill-opacity="0.9" />
@@ -69,9 +69,11 @@ export default {
       }
     },
     timeScale(){
+      let rectH = (this.width - this.marginRight - this.marginLeft) / (this.timeRange[1] + 1)
+      let cur = this
       return  d3.scaleLinear()
                 .domain([this.timeRange[0], this.timeRange[1]])
-                .range([0, this.width - this.marginLeft]);
+                .range([0+rectH/2, rectH * (cur.timeRange[1] +1)- rectH / 2] );
     },
     divCss() {
       return (
@@ -91,8 +93,9 @@ export default {
       );
     },
     timelinePath(){
+      let rectH = (this.width - this.marginRight - this.marginLeft) / (this.timeRange[1] + 1)
       let cur = this
-      return d3.line()([[0, cur.timelineHeight/2], [cur.width, cur.timelineHeight/2]])
+      return d3.line()([[0, cur.timelineHeight/2], [rectH * (cur.timeRange[1] +1), cur.timelineHeight/2]])
     },
     eventHeatmapHeight(){
       let rectH = (this.width - this.marginRight - this.marginLeft) / (this.timeRange[1] + 1)
@@ -162,7 +165,7 @@ export default {
     group.append("g").selectAll(".borderPath").data([0,1,2,3,4,5,6,7,
     8,9,10,11,12,13,14]).enter().append("path")
     .attr('d', d => {
-        return lineGen([[0, d * rectH], [rectH * (cur.timeRange[1] + 2), d * rectH]])}
+        return lineGen([[0, d * rectH], [rectH * (cur.timeRange[1] +1), d * rectH]])}
       )
       .attr("stroke-width", 1)
       .attr("stroke", "grey")
