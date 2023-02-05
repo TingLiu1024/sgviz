@@ -26,29 +26,29 @@
         <!-- 可以加入当前速度信息 -->
     <a-collapse-panel key="ego" header="Ego">
       <a-row justify = "space-around"> 
-        <a-tag>Speed : {{!currentEgoData["speed"]?null:currentEgoData["speed"].toFixed(2)}}</a-tag>  
-      <a-tag>Acceleration : {{!currentEgoData["acceleration"]?null:currentEgoData["acceleration"].toFixed(2)}}</a-tag> 
-      <a-tag>YawDiff : {{yawDiff}}</a-tag>
+        <a-tag  :color="speedFillColor">Speed : {{!currentEgoData["speed"]?null:currentEgoData["speed"].toFixed(2)}}</a-tag>  
+      <a-tag  :color="accelerationColor">Acceleration : {{!currentEgoData["acceleration"]?null:currentEgoData["acceleration"].toFixed(2)}}</a-tag> 
+      <a-tag  :color="yawDiffColor">YawDiff : {{yawDiff}}</a-tag>
       
       </a-row>
       <a-row style = "margin-top:2px" align="middle"> 
-        <a-col :span ="4">  <a-tag>Speed : </a-tag>  </a-col>
+        <a-col :span ="4">  <a-tag  :color="speedFillColor">Speed : </a-tag>  </a-col>
         <a-col :span ="4">  
           <a-input placeholder="Min" size="small" v-model:value="speedRange[0]"  >
            </a-input>  
         </a-col>
         <a-col :span ="10">   <a-slider v-model:value="speedRange" range size="small" 
-        :min ="0" :max="60"/>  </a-col>
+          :min="speedTotalRange[0]" :max="speedTotalRange[1]" :step="0.1"/>  </a-col>
         <a-col :span ="4">  <a-input placeholder="Max" size="small"  v-model:value="speedRange[1]"> </a-input>  </a-col>
         <a-col :span ="2">  <a-checkbox v-model:checked="speedConsider"></a-checkbox> </a-col>
       </a-row>
       <a-row style = "margin-top:2px" align="middle"> 
-        <a-col :span ="4">  <a-tag>Acceleration : </a-tag>  </a-col>
+        <a-col :span ="4">  <a-tag  :color="accelerationColor">Acceleration : </a-tag>  </a-col>
         <a-col :span ="4">  
           <a-input placeholder="Min" size="small" v-model:value="accelerationRange[0]"> </a-input>  
         </a-col>
         <a-col :span ="10">  
-           <a-slider v-model:value="accelerationRange" range size="small"  :min ="-30" :max="30"/> 
+           <a-slider v-model:value="accelerationRange" range size="small"  :min="accelerationTotalRange[0]" :max="accelerationTotalRange[1]" :step="0.1"/> 
          </a-col>
         <a-col :span ="4"> 
            <a-input placeholder="Max" size="small" v-model:value="accelerationRange[1]"> </a-input> 
@@ -56,12 +56,14 @@
         <a-col :span ="2">  <a-checkbox v-model:checked="accelerationConsider"></a-checkbox> </a-col>
       </a-row>
       <a-row style = "margin-top:2px" align="middle"> 
-        <a-col :span ="4">  <a-tag>YawDiff : </a-tag>  </a-col>
+        <!-- <a-col :span ="4">  <a-tag :color="yawDiffColor" style="color:black" >YawDiff : </a-tag>  </a-col> -->
+        <a-col :span ="4">  <a-tag :color="yawDiffColor"  >YawDiff : </a-tag>  </a-col>
+
         <a-col :span ="4">  
           <a-input placeholder="Min" size="small"  v-model:value="yawDiffRange[0]"> </a-input> 
         </a-col>
         <a-col :span ="10">   
-          <a-slider v-model:value="yawDiffRange" range size="small" :min="-10" :max="10"/>  
+          <a-slider v-model:value="yawDiffRange" range size="small" :min="yawDiffTotalRange[0]" :max="yawDiffTotalRange[1]" :step="0.01" />  
         </a-col>
         <a-col :span ="4">  
           <a-input placeholder="Max" size="small"  v-model:value="yawDiffRange[1]"> </a-input>  
@@ -220,9 +222,13 @@ export default {
       checked:false,
       tagColor: "#87d068",
       loading:false,
-      speedRange:[15,30],
-      accelerationRange:[-20, 20],
-      yawDiffRange:[-5, 5],
+      speedTotalRange:[0,47],
+      accelerationTotalRange:[-32, 104],
+      yawDiffTotalRange:[-3.5, 3.5],
+      
+      speedRange:[5,30],
+      accelerationRange:[-15, 30],
+      yawDiffRange:[-2, 2],
       speedConsider:false,
       accelerationConsider:false,
       yawDiffConsider:false,
@@ -231,6 +237,8 @@ export default {
   },
   computed: {
     ...mapState(["sgBrushGraph","currentEgoData", "currentLogId"]),
+    ...mapState(["speedFillColor", "accelerationColor", "yawDiffColor"]),
+
     divCss() {
       return (
         "position: absolute; border: 0px solid black;" +
@@ -369,6 +377,7 @@ export default {
 }
 .el-card >>> .el-card__body {
   height: 100%;
+  
 }
 .el-button .custom-loading .circular .path {
   animation: loading-dash 1.5s ease-in-out infinite;
@@ -377,5 +386,9 @@ export default {
   stroke-width: 2;
   stroke: var(--el-button-text-color);
   stroke-linecap: round;
+}
+.el-card >>> .ant-tag{
+  opacity: 0.7;
+  
 }
 </style>

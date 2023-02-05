@@ -4,6 +4,7 @@ node_modules
 datasets
 public
 src/assets
+html/
 
 
 # local env files

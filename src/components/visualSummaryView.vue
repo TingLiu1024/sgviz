@@ -97,7 +97,7 @@ export default {
       leftTurnColor:"#ff7f00",
       rightTurnColor:"#377eb8",
       NotTurnColor:"#b3b3b3",
-      speedFillColor:"#b3e2cd",
+      
       legendW:15,
       legendH:10,
       legendInterVal:10,
@@ -123,7 +123,7 @@ export default {
     }
   },
   computed:{
-    ...mapState(["currentTrackingData", "mapAll", "currentTime", "egoColor","currentEventData"]),
+    ...mapState(["currentTrackingData", "mapAll", "currentTime", "egoColor","currentEventData", "speedFillColor"]),
     divCss(){
         return "position: absolute; border: 0px solid black;" +  
               "height:" + this.height + "px;" +

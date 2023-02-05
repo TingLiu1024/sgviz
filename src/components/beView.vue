@@ -58,7 +58,7 @@
         />
       </g>
       <!-- legend -->
-      <g id ="lineLegend" :transform ="`translate(${svgWidth - marginLeft},${marginTop})`"> 
+      <g id ="lineLegendBev" :transform ="`translate(${svgWidth - marginLeft},${marginTop})`"> 
         <g id = "lineLegendTextBev"></g>
 
         <g :transform ="`translate(${legendW/2},${0 + 1 * (legendH + legendInterVal)  + legendH / 2})`"
@@ -73,7 +73,6 @@
           :stroke="peoColor"
           stroke-width="1.5"
         />
-        
         <rect :width="legendW"
             :height="legendH"
             x="0"
@@ -152,7 +151,7 @@ export default {
       tooltip_css:
         "position: absolute;padding: 7px;font-size: 0.9em;pointer-events: none;background: #fff;border: 1px solid #ccc;" +
         "border-radius: 4px;-moz-box-shadow: 3px 3px 10px 0px rgba(0, 0, 0, 0.25);display:none" +
-        "-webkit-box-shadow: 3px 3px 10px 0px rgba(0, 0, 0, 0.25);box-shadow: 3px 3px 10px 0px rgba(0, 0, 0, 0.25);display:none"
+        "-webkit-box-shadow: 3px 3px 10px 0px rgba(0, 0, 0, 0.25);box-shadow: 3px 3px 10px 0px rgba(0, 0, 0, 0.25);display:none;z-index: 100;"
     };
   },
   computed: {

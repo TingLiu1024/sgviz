@@ -1,47 +1,66 @@
 <template>
   
     <controlPanel
-      :width = 'sysWidth * 0.25'
+      :width = 'sysWidth * 0.2'
       :height = 'sysHeight * 0.37 - 2 * border'
       :top = "border"
       :left = "border"
     />
     <beView 
-      :width = 'sysWidth * 0.25'
+      :width = 'sysWidth * 0.2'
       :height = 'sysHeight * 0.47'
       :top = "sysHeight * 0.37 - border "
       :left = "border"
     />
     <sgView v-if = "summaryViewState"
-      :width = 'sysWidth * 0.3'
+      :width = 'sysWidth * 0.25'
       :height = 'sysHeight * 0.45'
       :top = "border"
-      :left = " sysWidth * 0.25 + 2 * border"
+      :left = " sysWidth * 0.2 + 2 * border"
     />
     <sgDetailView 
-       :width = 'sysWidth * 0.3'
+       :width = 'sysWidth * 0.25'
       :height = 'sysHeight * 0.37 - 2 * border'
       :top = "sysHeight * 0.45 +  border"
-      :left = "sysWidth * 0.25 + 2 * border"
+      :left = "sysWidth * 0.2 + 2 * border"
     />
     <visualSummaryView v-if = "summaryViewState"
-      :width = 'sysWidth * 0.45 - 4 * border'
+      :width = 'sysWidth * 0.40 - 4 * border'
       :height = 'sysHeight * 0.46'
       :top = "border"
-      :left = "sysWidth * 0.55 + 3 * border"
+      :left = "sysWidth * 0.45 + 3 * border"
     />
     <graphSearchResult v-if = "summaryViewState"
-      :width = 'sysWidth * 0.45 - 4 * border'
+      :width = 'sysWidth * 0.40 - 4 * border'
       :height = 'sysHeight * 0.36 - 2 * border'
       :top = "sysHeight * 0.46 + border"
-      :left = "sysWidth * 0.55 + 3 * border"
+      :left = "sysWidth * 0.45 + 3 * border"
     />
     <topoSummary v-if = "summaryViewState"
-    :width = 'sysWidth * 1 - 2 * border'
+    :width = 'sysWidth * 1.05 -  border'
       :height = 'sysHeight * 0.2 +  border'
       :top = "sysHeight * 0.82 + border"
       :left = "border"
     />
+    <projectionView v-if = "summaryViewState"
+       :width = 'sysWidth * 0.2'
+      :height = 'sysHeight * 0.40 + border'
+      :top = "border + sysHeight * 0.42"
+      :left = "sysWidth * 0.85 "
+    />
+    <graphStatisticView v-if = "summaryViewState"
+       :width = 'sysWidth * 0.2'
+      :height = 'sysHeight * 0.42 '
+      :top = "border "
+      :left = "sysWidth * 0.85 "
+    />
+    <projectionLegend v-if = "projectLegendShow"
+       :width = 'sysWidth * 0.1'
+      :height = 'sysHeight * 1.1 '
+      :top = "border "
+      :left = "sysWidth * 1.05 "
+    />
+    <!-- :height = 'sysHeight * 0.82' -->
 
 
 </template>
@@ -49,12 +68,14 @@
 <script>
 import beView from './components/beView.vue'
 import controlPanel from './components/controlPanel.vue'
-// import graphStatisticView from './components/graphStatisticView.vue'
+import graphStatisticView from './components/graphStatisticView.vue'
+import projectionView from './components/projectionView.vue'
 import sgDetailView from './components/sgDetailView.vue'
 import sgView from './components/sgView.vue'
 import visualSummaryView from './components/visualSummaryView.vue'
 import graphSearchResult from './components/graphSearchResult.vue'
 import topoSummary from './components/topoSummary.vue'
+import projectionLegend from './components/projectionLegend.vue'
 import { mapState } from 'vuex'
 export default {
   name: 'App',
@@ -65,14 +86,17 @@ export default {
     visualSummaryView,
     sgView,
     topoSummary,
-    graphSearchResult
+    graphSearchResult,
+    graphStatisticView,
+    projectionView,
+    projectionLegend
   },
   data(){
     return {
       //这两个变量是浏览器页面的大小，通过props遗传到子组件
       // width:document.documentElement.clientWidth ,
       // height:document.documentElement.clientHeight,
-      sysWidth: 2200,
+      sysWidth: 2700,
       // sysWidth: 2500,
       sysHeight: 1200,
       border: 10,
@@ -80,7 +104,7 @@ export default {
     }
   },
   computed:{
-      ...mapState(["summaryViewState"])
+      ...mapState(["summaryViewState", "projectLegendShow"])
   },
   mounted(){
     // setTimeout(function(){ this.flag = true }, 3000);
