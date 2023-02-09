@@ -1,6 +1,6 @@
 import { createStore } from 'vuex'
-import mapMIA from "../../datasets/MIAInfos.json"
-import mapPIT from "../../datasets/PITInfos.json"
+import mapMIA from "../../public/MIAInfos.json"
+import mapPIT from "../../public/PITInfos.json"
 import * as d3 from "d3";
 import logListDict from "../../public/logList.json"
 import projectionData from "../../public/tsne/projection.json"
@@ -35,6 +35,7 @@ export default createStore({
     sgBrushGraph:{"nodes":[],"edges":[]},
     currentEgoData:"",
     searchSgData:"",
+   
     searchMatchResult:[],
     plotFlag:false,
     summaryData:summaryData,
@@ -43,8 +44,12 @@ export default createStore({
     projectColors:["#4e79a7","#f28e2c","#e15759","#76b7b2","#59a14f","#edc949","#af7aa1","#ff9da7","#9c755f","#bab0ab"],
     // projectColors:["#8dd3c7","#bebada","#fb8072","#80b1d3","#fdb462","#b3de69","#fccde5","#d9d9d9","#bc80bd","#ccebc5","#ffed6f"]
     projectLegendShow:true,
-    projectLegendState:loglegendState
+    projectLegendState:loglegendState,
+    searchViewState:true,
+    brushViewState:false,
     
+    brushPlotFlag:false,
+    clickIf:false,
     
     
   },
@@ -87,8 +92,11 @@ export default createStore({
   },
   mutations: {
    updateLogId(state, id_){
-    state.currentLogId = id_
-    state.summaryViewState = false
+    if (id_ != state.currentLogId){
+      state.currentLogId = id_
+      state.summaryViewState = false
+    }
+    
     
    },
    updateDataset(state, data){
@@ -97,14 +105,13 @@ export default createStore({
     state.mapRange = state.currentTrackingData["mapRange"]
     state.currentSgData = data[1]
     state.currentEventData = data[2]
-    
     state.summaryViewState = true
-    
     // state.searchSgData = data[3]
     
    },
    updateTime(state, tsp){
     state.currentTime = tsp
+    state.clickIf = !state.clickIf
    },
    updateSgCurrentOverLane(state, laneId){
     // console.log(laneId)
@@ -139,18 +146,34 @@ export default createStore({
    updateCurrentEgoData(state, data){
     state.currentEgoData = data
    },
+   updateSearchResultViewState(state, str_){
+    if(str_ == 'brush'){
+      state.searchViewState = false
+      state.brushViewState = true
+    }
+    else{
+      state.searchViewState = true
+      state.brushViewState = false
+    }
+    
+    
+   },
    updateCurrentMatchData(state, data){
     
     state.searchMatchResult = data
     // console.log('state', state.searchMatchResult)
    },
-   updateMatchLogDataset(state, data){
-
-    
-    state.searchSgData = data
-    state.plotFlag = !state.plotFlag
-    
+   closePlot(state){
+    state.plotFlag = false
    },
+   openPlot(state){
+    state.plotFlag = true
+   },
+   updateMatchLogDataset(state, data){ 
+    state.searchSgData = data
+   },
+  
+   
    updateProjectLegendState(state, data){
     // console.log(state_)
     // console.log(state.projectLegendState[logId]["legendState"])
@@ -184,6 +207,7 @@ export default createStore({
           context.commit('updateMatchLogDataset', res)
       })
   },
+  
    
   },
   modules: {

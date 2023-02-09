@@ -156,7 +156,7 @@ export default {
   },
   computed: {
     ...mapState(["currentLogId","sgCurrentOverLane","sgCurrentOverCar", "sgCurrentOverPeo"]),
-    ...mapState(["currentTrackingData"]),
+    ...mapState(["currentTrackingData", "currentTime"]),
     ...mapState(["mapAll", "laneColor", "vehColor", "peoColor", "egoColor","mapCenter","mapRange"]),
     // ...mapGetters(["currentCity"]),
     // ...mapGetters(["currentMapData"]),
@@ -320,6 +320,10 @@ export default {
         this.nIntervId = null;
       }
       this.$store.commit('updateTime', this.currentTimestamp)
+    },
+    currentTime:function(){
+      this.currentTimestamp = this.currentTime
+
     }
   },
 

@@ -1,10 +1,11 @@
 <template>
   <div class="projectLegend" :style="divCss">
-    <el-row> 
-      <el-col :span="6">
+    <el-row style="margin-top:50px"> 
+      
+      <el-col :span="12">
         <el-button type="primary" size="small" @click="hideAll()">hide all</el-button>
       </el-col>
-      <el-col :span="6">
+      <el-col :span="12">
         <el-button type="primary" size="small" @click="showAll()">show all</el-button>
       </el-col>
 
@@ -12,7 +13,7 @@
    
     <svg :width="width" :height="svgHeight" :transform="`translate(${marginLeft}, ${marginTop})`"> 
      
-      <g  :transform="`translate(${10}, 30)`">
+      <g  :transform="`translate(${marginLeft}, ${marginTop})`">
         
         <g class="LogIdLegend">
         <circle

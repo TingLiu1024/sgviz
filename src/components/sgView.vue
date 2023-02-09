@@ -504,6 +504,7 @@ export default {
           cur.lassoFlag = false;
           cur.lassoPol.push(cur.lassoStart);
           let lassoEle = { nodes: [], edges: [] };
+          // console.log(node.selectChildren())
           node.selectChildren().each((d) => {
             // console.log(d)
             if (cur.inside([d.x, d.y], cur.lassoPol)) {

@@ -293,6 +293,7 @@ export default {
     search(){
       this.loading = true
       let cur = this
+      cur.$store.commit("updateSearchResultViewState", 'search');
       this.sgBrushGraph["nodes"].forEach(d =>{
         if (d.track_label_uuid == "ego"){
           Object.assign(d, {'speedConsider': cur.speedConsider, 'accelerationConsider':cur.accelerationConsider,
@@ -320,11 +321,11 @@ export default {
             tmpDict["frames"] =  Object.values(d)[0]
             res.push(tmpDict)
           })
+          
           cur.$store.dispatch('readMatchLogDataset', res)
+          
           cur.$store.commit('updateCurrentMatchData', res)
-          
-          
-          
+          cur.$store.commit('openPlot')
           // console.log('query', data["searchResults"][1])
           cur.loading = false
           // let data = response.data["paradata"]

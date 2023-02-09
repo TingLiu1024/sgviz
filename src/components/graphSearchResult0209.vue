@@ -1,6 +1,53 @@
 <template>
-  
-  <div id="multiGraph" :style="divCss" >
+  <div id="graphSearchResult" :style="divCss" v-if="searchViewState">
+    <el-divider> Graph Search Result </el-divider>
+    <el-scrollbar>
+      <g>
+        <el-row v-for="(d, i) in searchMatchResult" :key="i">
+          <el-scrollbar>
+            <div
+              :style="
+                'width:' +
+                rectH * d['frames'].length +
+                'px;height:' +
+                rectH +
+                'px;border: 0px red solid;display: flex;flex-direction: row;'
+              "
+            >
+              <div
+                :style="
+                  'height: ' +
+                  rectH +
+                  'px; width:' +
+                  rectH +
+                  'px; border: 1px grey solid'
+                "
+                v-for="(dd, j) in d['frames']"
+                :key="j"
+                @mouseover="itemMouse('over', d['logId'], dd, $event)"
+                @mouseout="itemMouse('out', d['logId'], dd, $event)"
+                @click="changeToFrame(d['logId'], dd)"
+              >
+                <svg
+                  width="100px"
+                  height="100px"
+                  :id="'svg' + d['logId'] + '_' + dd"
+                ></svg>
+              </div>
+            </div>
+          </el-scrollbar>
+        </el-row>
+      </g>
+      <el-row> </el-row>
+    </el-scrollbar>
+
+    <div
+      id="searchResultTip"
+      :style="tooltip_css"
+      v-html="tooltipContent"
+    ></div>
+  </div>
+  <div id="multiGraph" :style="divCss" v-if="brushViewState">
     <el-divider> {{ currentRes }} </el-divider>
     <el-scrollbar>
       <g>

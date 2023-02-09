@@ -167,7 +167,7 @@ export default {
   },
   mounted() {
     let cur = this;
-    console.log(cur.summaryData)
+    // console.log(cur.summaryData)
 
     this.plotDensity(cur.summaryData, "speed", 2, 30, 0.04, cur.speedFillColor);
     this.plotDensity(cur.summaryData, "acceleration", 2, 30, 0.1, cur.accelerationColor);

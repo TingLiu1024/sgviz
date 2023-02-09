@@ -79,7 +79,7 @@ def searchBylogId(logId_, searchG_, allGraph_, egoFlag_, speedConsider_, acceler
         edge_match = edgeM)
         
         if subgraph_is_isomorphic(cmp, frm):
-            matchFrames.append(frm)
+            matchFrames.append(int(frm))
     return {logId_: matchFrames}
 
 @app.route('/api/networkx', methods=['GET', 'POST'])
