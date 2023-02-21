@@ -9,7 +9,7 @@
           v-for="(dd, i) in allLaneData"
           :key="i"
           :d="pathPoly(dd)"
-          :fill="(sgCurrentOverLane == dd.id)?'#9434E3':'white'"
+          :fill="sgCurrentOverLane == dd.id ? '#9434E3' : 'white'"
           :stroke="laneColor"
           stroke-width="1px"
           fill-opacity="0.4"
@@ -34,9 +34,9 @@
           :key="i"
           :d="drawVehRect(d)"
           :stroke="vehColor"
-          :fill="(sgCurrentOverCar == d.track_label_uuid)?vehColor:'white'"
+          :fill="sgCurrentOverCar == d.track_label_uuid ? vehColor : 'white'"
           stroke-width="1px"
-          :fill-opacity="(sgCurrentOverCar == d.track_label_uuid)?0.5:0"
+          :fill-opacity="sgCurrentOverCar == d.track_label_uuid ? 0.5 : 0"
           @mouseover="itemMouse('over', d, $event)"
           @mouseout="itemMouse('out', d, $event)"
         />
@@ -49,67 +49,106 @@
           :cx="scaleX(d.cityX)"
           :cy="scaleY(d.cityY)"
           r="3"
-          :fill="(sgCurrentOverPeo == d.track_label_uuid)?peoColor:'white'"
+          :fill="sgCurrentOverPeo == d.track_label_uuid ? peoColor : 'white'"
           :stroke="peoColor"
           stroke-width="1.5"
-          :fill-opacity="(sgCurrentOverPeo == d.track_label_uuid)?0.7:0"
+          :fill-opacity="sgCurrentOverPeo == d.track_label_uuid ? 0.7 : 0"
           @mouseover="itemMouse('over', d, $event)"
           @mouseout="itemMouse('out', d, $event)"
         />
       </g>
       <!-- legend -->
-      <g id ="lineLegendBev" :transform ="`translate(${svgWidth - marginLeft},${marginTop})`"> 
-        <g id = "lineLegendTextBev"></g>
-
-        <g :transform ="`translate(${legendW/2},${0 + 1 * (legendH + legendInterVal)  + legendH / 2})`"
+      <g
+        id="lineLegendBev"
+        :transform="`translate(${svgWidth - marginLeft},${marginTop})`"
       >
-        <path :d="drawStar(egoSize+2)" :fill="egoColor" fill-opacity="0.9" />
-      </g>
+        <g id="lineLegendTextBev"></g>
+
+        <g
+          :transform="`translate(${legendW / 2},${
+            0 + 1 * (legendH + legendInterVal) + legendH / 2
+          })`"
+        >
+          <path
+            :d="drawStar(egoSize + 2)"
+            :fill="egoColor"
+            fill-opacity="0.9"
+          />
+        </g>
         <circle
-          :cx="legendW/2"
-          :cy="0 + 2 * (legendH + legendInterVal)  + legendH / 2"
+          :cx="legendW / 2"
+          :cy="0 + 2 * (legendH + legendInterVal) + legendH / 2"
           r="5"
           fill="none"
           :stroke="peoColor"
           stroke-width="1.5"
         />
-        <rect :width="legendW"
-            :height="legendH"
-            x="0"
-            :y="0 +  3* (legendH + legendInterVal)"
-            fill="none"
-            :stroke = "vehColor"
-            stroke-width = "2"
+        <rect
+          :width="legendW"
+          :height="legendH"
+          x="0"
+          :y="0 + 3 * (legendH + legendInterVal)"
+          fill="none"
+          :stroke="vehColor"
+          stroke-width="2"
         ></rect>
 
-        <rect :width="legendW"
-            :height="legendH"
-            x="0"
-            :y="0 +  4* (legendH + legendInterVal)"
-            fill="none"
-            :stroke = "laneColor"
-            stroke-width = "2"
+        <rect
+          :width="legendW"
+          :height="legendH"
+          x="0"
+          :y="0 + 4 * (legendH + legendInterVal)"
+          fill="none"
+          :stroke="laneColor"
+          stroke-width="2"
         ></rect>
-        
-
       </g>
     </svg>
 
     <div id="playControl" :style="controlCss">
       <el-row align="middle">
-        <el-col :span="5">
-          <div class="grid-content ep-bg-purple-dark" />
-          <el-button type="primary" size="small" @click="videoPlay">
-            <font-awesome-icon icon="fa-solid fa-play" />
-            <!-- <font-awesome-icon icon="fa-solid fa-champagne-glasses" color="red" size="s" style="padding:0px"/> -->
-          </el-button>
-          <el-button type="primary" size="small" @click="videoStop">
-            <font-awesome-icon icon="fa-solid fa-pause" />
-          </el-button>
+        <el-col :span="4">
+          <el-row>
+            <el-col :span="10">
+              <el-button type="primary" size="small" @click="videoPlay">
+                <font-awesome-icon icon="fa-solid fa-play" />
+                <!-- <font-awesome-icon icon="fa-solid fa-champagne-glasses" color="red" size="s" style="padding:0px"/> -->
+              </el-button>
+            </el-col>
+            <el-col :span="10">
+              <el-button type="primary" size="small" @click="videoStop">
+                <font-awesome-icon icon="fa-solid fa-pause" />
+                <!-- <font-awesome-icon icon="fa-solid fa-champagne-glasses" color="red" size="s" style="padding:0px"/> -->
+              </el-button>
+            </el-col>
+          </el-row>
         </el-col>
-        <el-col :span="19">
+        <el-col :span="15">
           <div class="grid-content ep-bg-purple-dark" />
-          <el-slider v-model="currentTimestamp" :step="1" show-stops :min="0" :max="timeRange[1]" />
+          <el-slider
+            v-model="currentTimestamp"
+            :step="1"
+            show-stops
+            :min="0"
+            :max="timeRange[1]"
+          />
+        </el-col>
+        <el-col :span="4">
+          <el-row>
+            <el-col :span="2"></el-col>
+            <el-col :span="10">
+              <el-button type="primary" size="small" @click="videoMinus">
+                <font-awesome-icon icon="fa-solid fa-minus" />
+                <!-- <font-awesome-icon icon="fa-solid fa-champagne-glasses" color="red" size="s" style="padding:0px"/> -->
+              </el-button>
+            </el-col>
+            <el-col :span="10">
+              <el-button type="primary" size="small" @click="videoPlus">
+                <font-awesome-icon icon="fa-solid fa-plus" />
+                <!-- <font-awesome-icon icon="fa-solid fa-champagne-glasses" color="red" size="s" style="padding:0px"/> -->
+              </el-button>
+            </el-col>
+          </el-row>
         </el-col>
       </el-row>
     </div>
@@ -129,7 +168,7 @@ export default {
     height: Number,
     width: Number,
     top: Number,
-    left: Number
+    left: Number,
   },
   data() {
     // this.$store.commit('getLogList', trackingDataAll["allLogs"])
@@ -140,24 +179,37 @@ export default {
 
       nIntervId: "", // 控制播放
       playInterval: 100,
-      legendW:15,
-      legendH:10,
-      legendInterVal:10,
-      marginLeft:85,
-      marginTop:350,
+      legendW: 15,
+      legendH: 10,
+      legendInterVal: 10,
+      marginLeft: 85,
+      marginTop: 350,
       egoSize: 6,
       lineGenerator: d3.line(),
       tooltipContent: "",
       tooltip_css:
-        "position: absolute;padding: 7px;font-size: 0.9em;pointer-events: none;background: #fff;border: 1px solid #ccc;" +
+        "position: absolute;padding: 7px;font-size: 0.9em;pointer-events: none;background: rgba(255,255,255,0.6);border: 1px solid #ccc;" +
         "border-radius: 4px;-moz-box-shadow: 3px 3px 10px 0px rgba(0, 0, 0, 0.25);display:none" +
-        "-webkit-box-shadow: 3px 3px 10px 0px rgba(0, 0, 0, 0.25);box-shadow: 3px 3px 10px 0px rgba(0, 0, 0, 0.25);display:none;z-index: 100;"
+        "-webkit-box-shadow: 3px 3px 10px 0px rgba(0, 0, 0, 0.25);box-shadow: 3px 3px 10px 0px rgba(0, 0, 0, 0.25);display:none;z-index: 100;",
     };
   },
   computed: {
-    ...mapState(["currentLogId","sgCurrentOverLane","sgCurrentOverCar", "sgCurrentOverPeo"]),
+    ...mapState([
+      "currentLogId",
+      "sgCurrentOverLane",
+      "sgCurrentOverCar",
+      "sgCurrentOverPeo",
+    ]),
     ...mapState(["currentTrackingData", "currentTime"]),
-    ...mapState(["mapAll", "laneColor", "vehColor", "peoColor", "egoColor","mapCenter","mapRange"]),
+    ...mapState([
+      "mapAll",
+      "laneColor",
+      "vehColor",
+      "peoColor",
+      "egoColor",
+      "mapCenter",
+      "mapRange",
+    ]),
     // ...mapGetters(["currentCity"]),
     // ...mapGetters(["currentMapData"]),
 
@@ -199,13 +251,12 @@ export default {
       return Math.min(this.height, this.width) - 50 - this.sliderH;
     },
 
-    
     scaleX() {
       return d3
         .scaleLinear()
         .domain([
           this.mapCenter[0] - this.mapRange,
-          this.mapCenter[0] + this.mapRange
+          this.mapCenter[0] + this.mapRange,
         ])
         .range([0, this.svgWidth]);
     },
@@ -214,7 +265,7 @@ export default {
         .scaleLinear()
         .domain([
           this.mapCenter[1] - this.mapRange,
-          this.mapCenter[1] + this.mapRange
+          this.mapCenter[1] + this.mapRange,
         ])
         .range([this.svgWidth, 0]);
     },
@@ -229,7 +280,7 @@ export default {
       let straightLanes = [],
         notStraightLanes = [];
       if (allLanes) {
-        allLanes.forEach(function(laneId) {
+        allLanes.forEach(function (laneId) {
           // console.log(currentMapData)
           if (
             currentMapData["laneInfos"][laneId.toString()].turn_direction ==
@@ -241,9 +292,8 @@ export default {
           }
         });
         // let laneData = [];
-        let laneData = []
-        straightLanes.concat(notStraightLanes).forEach(function(laneId) {
-          
+        let laneData = [];
+        straightLanes.concat(notStraightLanes).forEach(function (laneId) {
           laneData.push(currentMapData["laneInfos"][laneId.toString()]);
         });
         // console.log(laneData)
@@ -252,23 +302,22 @@ export default {
       return [];
     },
     egoData() {
-      let res = []
+      let res = [];
       if (this.currentTrackingData) {
-        
         res = d3.filter(
           this.currentTrackingData["trackingInfos"],
-          d =>
+          (d) =>
             (d.frame == this.currentTimestamp) & (d.track_label_uuid == "ego")
         );
-        this.$store.commit("updateCurrentEgoData", res[0])
-      } 
-      
+        this.$store.commit("updateCurrentEgoData", res[0]);
+      }
+
       return res;
     },
     timeRange() {
       if (this.currentTrackingData) {
         return d3.extent(
-          d3.map(this.currentTrackingData["trackingInfos"], d => d.frame)
+          d3.map(this.currentTrackingData["trackingInfos"], (d) => d.frame)
         );
       } else {
         return [];
@@ -278,7 +327,7 @@ export default {
       if (this.currentTrackingData) {
         return d3.filter(
           this.currentTrackingData["trackingInfos"],
-          d =>
+          (d) =>
             (d.frame == this.currentTimestamp) &
             (d.track_label_uuid != "ego") &
             (d.label_class == "VEHICLE")
@@ -291,7 +340,7 @@ export default {
       if (this.currentTrackingData) {
         return d3.filter(
           this.currentTrackingData["trackingInfos"],
-          d =>
+          (d) =>
             (d.frame == this.currentTimestamp) &
             (d.track_label_uuid != "ego") &
             (d.label_class == "PEOPLE")
@@ -299,32 +348,37 @@ export default {
       } else {
         return [];
       }
-    }
+    },
   },
   mounted() {
-    const legendG = d3.select('#lineLegendTextBev')
-    let cur = this
-    legendG.selectChildren().remove()
-      legendG.selectAll(".lineText").data(["EGO", "PEOPLE", "VEHICLE", "LANE"]).enter()
-      .append("text").attr("x",30).attr("y", (d,i)=>{return 10 + (i+1) * (cur.legendInterVal+
-        cur.legendH)}).text(d=>d)
-        .attr("text-anchor", "left")
-        .style("opacity",0.95)
-        .style("font-size", "12px")
-
+    const legendG = d3.select("#lineLegendTextBev");
+    let cur = this;
+    legendG.selectChildren().remove();
+    legendG
+      .selectAll(".lineText")
+      .data(["EGO", "PEOPLE", "VEHICLE", "LANE"])
+      .enter()
+      .append("text")
+      .attr("x", 30)
+      .attr("y", (d, i) => {
+        return 10 + (i + 1) * (cur.legendInterVal + cur.legendH);
+      })
+      .text((d) => d)
+      .attr("text-anchor", "left")
+      .style("opacity", 0.95)
+      .style("font-size", "12px");
   },
   watch: {
-    currentTimestamp: function() {
+    currentTimestamp: function () {
       if (this.currentTimestamp == this.timeRange[1]) {
         clearInterval(this.nIntervId);
         this.nIntervId = null;
       }
-      this.$store.commit('updateTime', this.currentTimestamp)
+      this.$store.commit("updateTime", this.currentTimestamp);
     },
-    currentTime:function(){
-      this.currentTimestamp = this.currentTime
-
-    }
+    currentTime: function () {
+      this.currentTimestamp = this.currentTime;
+    },
   },
 
   methods: {
@@ -333,7 +387,7 @@ export default {
 
       let scaleX = this.scaleX;
       let scaleY = this.scaleY;
-      let points = d3.map(d.polygon, function(dd) {
+      let points = d3.map(d.polygon, function (dd) {
         return [scaleX(dd[0]), scaleY(dd[1])];
       });
 
@@ -369,22 +423,36 @@ export default {
         [scaleX(bbox[1][0]), scaleY(bbox[1][1])],
         [scaleX(bbox[3][0]), scaleY(bbox[3][1])],
         [scaleX(bbox[2][0]), scaleY(bbox[2][1])],
-        [scaleX(bbox[0][0]), scaleY(bbox[0][1])]
+        [scaleX(bbox[0][0]), scaleY(bbox[0][1])],
       ]);
     },
 
     videoPlay() {
       let cur = this;
       if (!this.nIntervId) {
-        this.nIntervId = setInterval(function() {
+        this.nIntervId = setInterval(function () {
           cur.currentTimestamp += 1;
-          cur.$store.commit('updateTime', cur.currentTimestamp)
+          cur.$store.commit("updateTime", cur.currentTimestamp);
         }, this.playInterval);
       }
     },
     videoStop() {
       clearInterval(this.nIntervId);
       this.nIntervId = null;
+    },
+    videoPlus(){
+      let cur = this
+      if (cur.currentTimestamp < cur.timeRange[1]){
+        cur.currentTimestamp += 1;
+        cur.$store.commit("updateTime", cur.currentTimestamp);
+      }
+    },
+    videoMinus(){
+      let cur = this
+      if (cur.currentTimestamp > cur.timeRange[0]){
+        cur.currentTimestamp -= 1;
+        cur.$store.commit("updateTime", cur.currentTimestamp);
+      }
     },
     itemMouse(action, d, $event) {
       let tooltip = $("#bevTip");
@@ -396,8 +464,8 @@ export default {
       } else {
         tooltip.css("display", "none");
       }
-    }
-  }
+    },
+  },
 };
 </script>
 

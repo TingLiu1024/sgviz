@@ -28,7 +28,8 @@ npm run lint
 
 See [Configuration Reference](https://cli.vuejs.org/config/).
 
-
-子图匹配目前用的2.8.8  --升级一下
+子图匹配目前用的2.8.8  
 
 GED用的2.8.8 timeout 为2s
+
+算不出来的10s

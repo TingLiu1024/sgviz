@@ -2,6 +2,12 @@
   
   <div id="multiGraph" :style="divCss" >
     <el-divider> {{ currentRes }} </el-divider>
+    <el-descriptions :column="2" border size="small">
+    <el-descriptions-item label="LogNum">{{ searchLogNum }} / 47</el-descriptions-item>
+    <el-descriptions-item label="FrameNum">{{ searchFrameNum }} / 8172</el-descriptions-item>
+    
+    
+  </el-descriptions>
     <el-scrollbar>
       <g>
         <el-row v-for="(d, i) in searchMatchResult" :key="i">
@@ -25,8 +31,8 @@
                 "
                 v-for="(dd, j) in d['frames']"
                 :key="j"
-                @mouseover="itemMouse('over', d['logId'], dd, $event)"
-                @mouseout="itemMouse('out', d['logId'], dd, $event)"
+                @mouseover="itemMouse('over', d['logId'], dd, d['frames'].length, $event)"
+                @mouseout="itemMouse('out', d['logId'], dd, d['frames'].length, $event)"
                 @click="changeToFrame(d['logId'], dd)"
               >
                 <svg
@@ -88,6 +94,17 @@ export default {
       "brushViewState",
       
     ]),
+    searchLogNum(){
+      return this.searchMatchResult.length
+    },
+    searchFrameNum(){
+      let cnt = 0
+      this.searchMatchResult.forEach(log=>{
+        cnt = cnt +log["frames"].length
+      })
+      return cnt
+
+    },
     currentRes(){
       if(this.searchViewState){
         return "Graph Search Result"
@@ -121,15 +138,18 @@ export default {
     changeToFrame(logId_, frm) {
       console.log("click", logId_, frm);
       this.$store.commit("updateLogId", logId_);
-      // this.$store.dispatch('getDataset', logId_)
+      
+      this.$store.dispatch('getDataset', logId_)
       this.$store.commit("updateTime", parseInt(frm));
     },
     sleep(ms) {
       return new Promise((resolve) => setTimeout(resolve, ms));
     },
-    itemMouse(action, logId_, frm, $event) {
+    itemMouse(action, logId_, frm,frame_len, $event) {
       let tooltip = $("#searchResultTip");
-      this.tooltipContent = "logId : " + logId_ + "<br>" + "frame: " + frm;
+      let cur = this
+      
+      this.tooltipContent = "logId : " + logId_ + "<br>" + "frame : " + frm + "<br>" + "total_frame : " + frame_len.toString();
       if (action == "over") {
         tooltip.css("display", "block");
         tooltip.css("left", $event.offsetX + 40);
@@ -479,4 +499,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.el-scrollbar{
+  height:90%;
+}
 </style>

@@ -17,11 +17,13 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 import { faPause } from '@fortawesome/free-solid-svg-icons'
 import { faPlay } from '@fortawesome/free-solid-svg-icons'
+import { faPlus } from '@fortawesome/free-solid-svg-icons'
+import { faMinus } from '@fortawesome/free-solid-svg-icons'
 import { faMagnifyingGlass} from '@fortawesome/free-solid-svg-icons'
 // import { faSpinner} from '@fortawesome/free-solid-svg-icons'
 
 
-library.add(faPause, faPlay, faMagnifyingGlass)
+library.add(faPause, faPlay, faMagnifyingGlass, faPlus, faMinus)
 
 
 const app = createApp(App)

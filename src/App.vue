@@ -30,7 +30,13 @@
       :top = "border"
       :left = "sysWidth * 0.45 + 3 * border"
     />
-    <graphSearchResult v-if = "summaryViewState"
+    <!-- <graphSearchResult v-if = "summaryViewState"
+      :width = 'sysWidth * 0.40 - 4 * border'
+      :height = 'sysHeight * 0.36 - 2 * border'
+      :top = "sysHeight * 0.46 + border"
+      :left = "sysWidth * 0.45 + 3 * border"
+    /> -->
+    <graphSearchResult 
       :width = 'sysWidth * 0.40 - 4 * border'
       :height = 'sysHeight * 0.36 - 2 * border'
       :top = "sysHeight * 0.46 + border"
@@ -42,13 +48,13 @@
       :top = "sysHeight * 0.82 + border"
       :left = "border"
     />
-    <projectionView v-if = "summaryViewState"
+    <projectionView 
        :width = 'sysWidth * 0.2'
       :height = 'sysHeight * 0.40 + border'
       :top = "border + sysHeight * 0.42"
       :left = "sysWidth * 0.85 "
     />
-    <graphStatisticView v-if = "summaryViewState"
+    <graphStatisticView 
        :width = 'sysWidth * 0.2'
       :height = 'sysHeight * 0.42 '
       :top = "border "

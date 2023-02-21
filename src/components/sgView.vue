@@ -88,7 +88,7 @@ export default {
       lassoFlag: false,
       lineGenerator: d3.line(),
       tooltip_css:
-        "position: absolute;padding: 7px;font-size: 0.9em;pointer-events: none;background: #fff;border: 1px solid #ccc;" +
+        "position: absolute;padding: 7px;font-size: 0.9em;pointer-events: none;background:rgba(255,255,255,0.6);border: 1px solid #ccc;" +
         "border-radius: 4px;-moz-box-shadow: 3px 3px 10px 0px rgba(0, 0, 0, 0.25);display:none" +
         "-webkit-box-shadow: 3px 3px 10px 0px rgba(0, 0, 0, 0.25);box-shadow: 3px 3px 10px 0px rgba(0, 0, 0, 0.25);display:none;z-index: 100;",
     };
@@ -145,7 +145,8 @@ export default {
     },
   },
   mounted() {
-    this.plotOneStampFdg(0, this.currentSgData);
+    console.log('mount')
+    this.plotOneStampFdg(this.currentTime, this.currentSgData);
 
     const legendG = d3.select("#lineLegendTextSg");
     let cur = this;
@@ -187,7 +188,7 @@ export default {
       return inside;
     },
     plotOneStampFdg(tsp, data) {
-      window.sgData = data;
+      // window.sgData = data;
       if (!data) {
         return [];
       }
@@ -420,13 +421,28 @@ export default {
         .on("mouseover", function (event, d) {
           let tooltip = $("#sgTip");
           // console.log('tooltip', d)
-          cur.tooltipContent =
+          if (d.label_class == "LANE"){
+            cur.tooltipContent =
+            "<p> id: " +
+            d.track_label_uuid +
+            "<br>" +
+            "class: " +
+            d.label_class +
+            "<br>" +
+            "turn_direction: " +
+            d.turn_direction +
+            "</p>";
+          }
+          else{
+            cur.tooltipContent =
             "<p> id: " +
             d.track_label_uuid +
             "<br>" +
             "class: " +
             d.label_class +
             "</p>";
+          }
+          
           tooltip.css("display", "block");
           tooltip.css("left", event.offsetX + 40);
           tooltip.css("top", event.offsetY - 10);
@@ -565,6 +581,7 @@ export default {
   },
   watch: {
     currentTime: function () {
+      // console.log('hello',this.currentSgData)
       this.lastFdgLayout = this.plotOneStampFdg(
         this.currentTime,
         this.currentSgData

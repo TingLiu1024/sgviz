@@ -196,8 +196,8 @@ export default createStore({
         res[logId_][frames[i].toString()] = getSimulationData(frames[i], data[logId_], 100, 10)
       }
     })
-    console.log(res)
-    window.res = res
+    // console.log(res)
+    // window.res = res
     state.searchSgData = res
     
    }

@@ -140,7 +140,7 @@ export default createStore({
     data["edges"].forEach( d=>{
       Object.assign(d, {"consider":true})
     })
-    console.log(data)
+    // console.log(data)
     state.sgBrushGraph = data
    },
    updateCurrentEgoData(state, data){
