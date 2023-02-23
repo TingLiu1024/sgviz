@@ -48,7 +48,8 @@
             :d="lineGenerator(lassoPol)"
             fill="none"
             stroke="grey"
-            stroke-dasharray="2,2"
+            stroke-width="2.5"
+            stroke-dasharray="3,3"
           ></path>
 
           <g id="frameProjectPoint">

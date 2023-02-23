@@ -183,7 +183,7 @@ export default {
       legendH: 10,
       legendInterVal: 10,
       marginLeft: 85,
-      marginTop: 350,
+      marginTop: 420,
       egoSize: 6,
       lineGenerator: d3.line(),
       tooltipContent: "",
@@ -248,7 +248,7 @@ export default {
       );
     },
     svgWidth() {
-      return Math.min(this.height, this.width) - 50 - this.sliderH;
+      return Math.min(this.height, this.width) -15 ;
     },
 
     scaleX() {

@@ -1,18 +1,19 @@
 <template>
   <div id="sgView" :style="divCss">
     <el-divider>Scene Graph View</el-divider>
-    <svg :width="svgWidth" :height="svgWidth" id="sgsvg">
+    <svg :width="svgWidth + legendWidth" :height="svgWidth " id="sgsvg">
       <path
         :d="lineGenerator(lassoPol)"
         fill="none"
         stroke="grey"
+        stroke-width="2.5"
         stroke-dasharray="5,5"
       ></path>
       <g id="dynamicGroup"></g>
       <!-- legend -->
       <g
         id="lineLegendSg"
-        :transform="`translate(${svgWidth - marginLeft},${marginTop})`"
+        :transform="`translate(${svgWidth + 50 },${marginTop})`"
       >
         <g id="lineLegendTextSg"></g>
 
@@ -67,6 +68,7 @@ export default {
   },
   data() {
     return {
+      legendWidth: 200,
       fdgMargin: 20, // 用来调整比例尺保证结点都在图中
       lastFdgLayout: [], //
       // tooltip :$("#bevTip"),
@@ -74,7 +76,7 @@ export default {
       legendH: 10,
       legendInterVal: 10,
       marginLeft: 85,
-      marginTop: 350,
+      marginTop: 250,
       egoSize: 9,
       vehSize: 100,
       relStrokeColorDict: {
@@ -219,7 +221,7 @@ export default {
       const graph = data[tsp.toString()];
 
       // console.log(graph)
-      let lastObjs = [];
+      let lastObjs = [];lastObjs
 
       if (lastFdgLayout) {
         lastObjs = d3.map(lastFdgLayout, (d) => d.track_label_uuid);
@@ -431,6 +433,9 @@ export default {
             "<br>" +
             "turn_direction: " +
             d.turn_direction +
+            "<br>" +
+            "intersection: " +
+            d.is_intersection +
             "</p>";
           }
           else{

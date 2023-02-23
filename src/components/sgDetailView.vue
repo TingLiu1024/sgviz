@@ -1,7 +1,26 @@
 <template>
   <div id="sgDetailView" :style="divCss">
-    <el-divider>Graph Detail View</el-divider>
+    <el-divider>Console</el-divider>
     <!-- <el-card  :style="'height:' + (height-40) + 'px' "></el-card> -->
+    <el-row style="margin-bottom:3px"> 
+      <el-col :span = "12" >
+        
+        <el-row align = "middle" justify = "center">
+          <label style="font-size:18px"> Choose the logId of video</label> 
+     
+        </el-row>
+      </el-col>
+      <el-col :span = "12">
+        <el-select style="width:100%" v-model="selectLogId" class="m-2" placeholder="Select" >
+        <el-option
+      v-for="(item,i) in logList"
+      :key="i"
+      :label="item"
+      :value="item"
+    />
+  </el-select>
+      </el-col>
+    </el-row>
     <el-row style="margin-bottom:3px">
       <el-col :span = "12">
         <el-button type="primary" style = "width:80%" @click = "search">
@@ -202,7 +221,7 @@
 </template>
 
 <script>
-import {mapState} from "vuex"
+import {mapState, mapGetters} from "vuex"
 import axios from "axios"
 import * as d3 from "d3"
 export default {
@@ -236,8 +255,25 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(["logList"]),
+    
     ...mapState(["sgBrushGraph","currentEgoData", "currentLogId"]),
     ...mapState(["speedFillColor", "accelerationColor", "yawDiffColor"]),
+    selectLogId:{
+      get(){
+        this.$store.dispatch('getDataset',this.$store.state.currentLogId)
+        // this.updateImgList()
+        return this.$store.state.currentLogId
+        
+      },
+      set(value){
+        this.$store.commit('updateLogId', value)
+        // this.updateImgList()
+      this.$store.dispatch('getDataset',value)
+
+      }
+
+    },
 
     divCss() {
       return (
@@ -294,6 +330,12 @@ export default {
       this.loading = true
       let cur = this
       cur.$store.commit("updateSearchResultViewState", 'search');
+      cur.speedRange[0] = parseFloat( cur.speedRange[0])
+      cur.speedRange[1] = parseFloat( cur.speedRange[1])
+      cur.accelerationRange[0] = parseFloat( cur.accelerationRange[0])
+      cur.accelerationRange[1] = parseFloat( cur.accelerationRange[1])
+      cur.yawDiffRange[0] = parseFloat( cur.yawDiffRange[0])
+      cur.yawDiffRange[1] = parseFloat( cur.yawDiffRange[1])
       this.sgBrushGraph["nodes"].forEach(d =>{
         if (d.track_label_uuid == "ego"){
           Object.assign(d, {'speedConsider': cur.speedConsider, 'accelerationConsider':cur.accelerationConsider,
@@ -302,6 +344,7 @@ export default {
         }
       })
       // console.log(this.sgBrushGraph)
+      console.log( cur.yawDiffRange)
       let request = {'egoInfos':d3.filter(cur.sgBrushGraph["nodes"],
         d=>d.track_label_uuid == "ego")[0]
         ,'searchGraph':cur.sgBrushGraph, "logId": cur.currentLogId}
@@ -373,8 +416,8 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .el-card {
-  min-height: 88%;
-  height: 88%;
+  min-height: 78%;
+  height: 78%;
 }
 .el-card >>> .el-card__body {
   height: 100%;

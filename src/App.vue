@@ -2,26 +2,26 @@
   
     <controlPanel
       :width = 'sysWidth * 0.2'
-      :height = 'sysHeight * 0.37 - 2 * border'
+      :height = 'sysHeight * 0.33 - 2 * border'
       :top = "border"
       :left = "border"
     />
     <beView 
       :width = 'sysWidth * 0.2'
-      :height = 'sysHeight * 0.47'
-      :top = "sysHeight * 0.37 - border "
+      :height = 'sysHeight * 0.51'
+      :top = "sysHeight * 0.33 - border "
       :left = "border"
     />
     <sgView v-if = "summaryViewState"
       :width = 'sysWidth * 0.25'
-      :height = 'sysHeight * 0.45'
-      :top = "border"
+      :height = 'sysHeight * 0.35'
+      :top = "sysHeight * 0.49 -border"
       :left = " sysWidth * 0.2 + 2 * border"
     />
     <sgDetailView 
        :width = 'sysWidth * 0.25'
-      :height = 'sysHeight * 0.37 - 2 * border'
-      :top = "sysHeight * 0.45 +  border"
+      :height = 'sysHeight * 0.49 - 2 * border'
+      :top = " border"
       :left = "sysWidth * 0.2 + 2 * border"
     />
     <visualSummaryView v-if = "summaryViewState"

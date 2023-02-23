@@ -1,14 +1,11 @@
 <template>
   <div id="control" :style = "divCss">
     <el-divider > Image View </el-divider>
-    <el-row> 
+    <!-- <el-row> 
       <el-col :span = "10" >
         <el-row align = "middle" justify = "center">
-           <label style="font-size:16px"> Choose the logId of video</label>
-           
-        </el-row>
-        
-        
+           <label style="font-size:16px"> Choose the logId of video</label>      
+        </el-row>  
       </el-col>
       <el-col :span = "14">
         <el-select style="width:100%" v-model="selectLogId" class="m-2" placeholder="Select" >
@@ -20,9 +17,7 @@
     />
   </el-select>
       </el-col>
-      
-   
-    </el-row>
+    </el-row> -->
     <img :src = "imgPath" :width="width">
     <!-- <img src = "../assets/images/ring_front_center/0ef28d5c-ae34-370b-99e7-6709e1c4b929/ring_front_center_315969338033780896.jpg"> -->
     <!-- <img src = "../assets/logo.png"> -->
@@ -97,9 +92,9 @@ export default {
       
   },
   watch: {
-    // currentLogId: function() {
-    //   this.selectLogId = this.currentLogId
-    // }
+    currentLogId: function() {
+      this.updateImgList()
+    }
     
   },
   methods:{

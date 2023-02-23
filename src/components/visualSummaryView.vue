@@ -114,11 +114,10 @@ export default {
       
       streamColorDict:{
         "PEOPLE_notOnLane":"#FFCDBF", "PEOPLE_onLane":"#FF8680", "VEHICLE_onLane":"#1f78b4","VEHICLE_notOnLane":"#a6cee3",
-        "PEOPLE": "#D25565" ,"VEHICLE":"#3E6D9C"
+        "PEOPLE": "#D25565" ,"VEHICLE":"#3E6D9C", "PEOPLE_Free":"#FFCDBF", "VEHICLE_Free":"#a6cee3"
       },
       egoFlag:false,
       heatRectH:"",
-      
       
     }
   },
@@ -213,7 +212,13 @@ export default {
         tmp["oriData"].forEach(function(d){
           uppers.push([d.frame, d.yawMod + cur.lineHalfWidth])
           speedLowers.push([scaleX(d.frame), scaleY(d.yawMod + cur.lineHalfWidth)-5])
-          speedUppers.push([scaleX(d.frame) , scaleY(d.yawMod + cur.lineHalfWidth)-scaleSpeed(d.speed)-5])
+          if(d.speed==null){
+            speedUppers.push([scaleX(d.frame) , scaleY(d.yawMod + cur.lineHalfWidth)-5])
+          }
+          else{
+            speedUppers.push([scaleX(d.frame) , scaleY(d.yawMod + cur.lineHalfWidth)-scaleSpeed(d.speed)-5])
+          }
+          
           lowers.push([d.frame, d.yawMod - cur.lineHalfWidth])
         })
         
