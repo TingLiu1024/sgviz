@@ -2,8 +2,8 @@
 node_modules
 /dist
 datasets
-public
-src/assets
+public/*
+src/assets/images
 html/
 src/components/topoSummaryCopy.vue
 src/AppLayout0226copy.vue
