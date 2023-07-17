@@ -7,35 +7,24 @@
 ## Project Setup
 本项目前端使用Vue3 + Vuex + antd + element-plus + d3， 后端使用python的flask和networkx(2.8.8)， python环境自行安装。
 ### 配置前端环境
+git clone 仓库后， 进入**sgviz**文件夹， 启动命令行，运行
 ```
 npm install
 ```
 
 ### 把数据放在对应路径
 
-1. images放在 assets文件夹下
-3. 其他数据放在public文件夹下
++ images放在 src/assets文件夹下
+  ![dataPath](https://github.com/TingLiu1024/sgviz/blob/main/src/assets/dataPath1.png)
++ 其他数据放在public文件夹下
+ ![dataPath](https://github.com/TingLiu1024/sgviz/blob/main/src/assets/dataPath2.png)
 
 
-
-### Compiles and minifies for production
-
+### 启动系统
+start.sh中包含两部分，运行.py文件和启动前端服务
 ```
-npm run build
+bash start.sh
 ```
+### 在浏览器中打开页面
 
-### Lints and fixes files
 
-```
-npm run lint
-```
-
-### Customize configuration
-
-See [Configuration Reference](https://cli.vuejs.org/config/).
-
-子图匹配目前用的2.8.8  
-
-GED用的2.8.8 timeout 为2s
-
-算不出来的10s
