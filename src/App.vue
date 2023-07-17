@@ -25,8 +25,8 @@
       :left = "sysWidth * 0.2 + 2 * border"
     />
     <visualSummaryView v-if = "summaryViewState"
-      :width = 'sysWidth * 0.40 - 4 * border'
-      :height = 'sysHeight * 0.46'
+      :width = 'sysWidth * 0.65 - 4 * border'
+      :height = 'sysHeight * 0.55'
       :top = "border"
       :left = "sysWidth * 0.45 + 3 * border"
     />
@@ -37,34 +37,40 @@
       :left = "sysWidth * 0.45 + 3 * border"
     /> -->
     <graphSearchResult 
-      :width = 'sysWidth * 0.40 - 4 * border'
-      :height = 'sysHeight * 0.36 - 2 * border'
-      :top = "sysHeight * 0.46 + border"
-      :left = "sysWidth * 0.45 + 3 * border"
+      :width = 'sysWidth * 0.7 - 4 * border'
+      :height = 'sysHeight * 0.4 '
+      :top = "sysHeight * 0.82 + border"
+      :left = "sysWidth * 0.2 + 2 * border"
     />
-    <topoSummary v-if = "summaryViewState"
+    <!-- <topoSummary v-if = "summaryViewState"
     :width = 'sysWidth * 1.05 -  border'
       :height = 'sysHeight * 0.2 +  border'
       :top = "sysHeight * 0.82 + border"
       :left = "border"
+    /> -->
+    <topoSummary v-if = "summaryViewState"
+    :width = 'sysWidth * 0.65 - 4 * border'
+      :height = 'sysHeight * 0.2 +  border'
+      :top = "sysHeight * 0.55 + border"
+      :left = "sysWidth * 0.45 + 3 * border"
     />
     <projectionView 
        :width = 'sysWidth * 0.2'
       :height = 'sysHeight * 0.40 + border'
-      :top = "border + sysHeight * 0.42"
-      :left = "sysWidth * 0.85 "
+      :top = "sysHeight * 0.82 + border"
+      :left = "sysWidth * 0.9 -border"
     />
     <graphStatisticView 
        :width = 'sysWidth * 0.2'
-      :height = 'sysHeight * 0.42 '
-      :top = "border "
-      :left = "sysWidth * 0.85 "
+      :height = 'sysHeight * 0.4 +border'
+      :top = "sysHeight * 0.82 + border "
+      :left = "border "
     />
     <projectionLegend v-if = "projectLegendShow"
-       :width = 'sysWidth * 0.1'
+       :width = 'sysWidth * 0.1 +50'
       :height = 'sysHeight * 1.1 '
       :top = "border "
-      :left = "sysWidth * 1.05 "
+      :left = "sysWidth * 1.1 "
     />
     <!-- :height = 'sysHeight * 0.82' -->
 

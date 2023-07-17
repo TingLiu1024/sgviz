@@ -3,27 +3,27 @@
     <el-divider> Projection View </el-divider>
     <el-row style="margin-bottom: 3px">
       <el-col :span="4">
-        <el-button type="primary" size="small" @click="highlight('current')">
+        <el-button type="primary" style="font-size:18px;padding:0px 2px;" size="default"  @click="highlight('current')">
           Current</el-button
         >
       </el-col>
-      <el-col :span="4">
-        <el-button type="primary" size="small" @click="highlight('search')">
+      <el-col :span="3.5">
+        <el-button type="primary" size="default" style="font-size:18px;padding:0px 2px;" @click="highlight('search')">
           Search</el-button
         >
       </el-col>
-      <el-col :span="6">
-        <el-button type="primary" size="small" @click="update_view()">
+      <el-col :span="5">
+        <el-button type="primary" size="default" style="font-size:18px;padding:0px 2px;" @click="update_view()">
           Plot Brush</el-button
         >
       </el-col>
-      <el-col :span="5">
-        <el-button type="primary" size="small" @click="update_legend('show')">
+      <el-col :span="6">
+        <el-button type="primary" size="default" style="font-size:18px;padding:0px 2px;" @click="update_legend('show')">
           Show Legend</el-button
         >
       </el-col>
-      <el-col :span="5">
-        <el-button type="primary" size="small" @click="update_legend('hide')">
+      <el-col :span="5.5">
+        <el-button type="primary" size="default" style="font-size:18px;padding:0px 2px;" @click="update_legend('hide')">
           Hide Legend</el-button
         >
       </el-col>
@@ -111,7 +111,7 @@ export default {
       lineGenerator: d3.line(),
       local_brush: "",
       tooltip_css:
-        "position: absolute;padding: 7px;font-size: 0.9em;pointer-events: none;background: rgba(255,255,255,0.6);border: 1px solid #ccc;" +
+        "position: absolute;padding: 7px;font-size: 25px;pointer-events: none;background: rgba(255,255,255,0.6);border: 1px solid #ccc;" +
         "border-radius: 4px;-moz-box-shadow: 3px 3px 10px 0px rgba(0, 0, 0, 0.25);display:none" +
         "-webkit-box-shadow: 3px 3px 10px 0px rgba(0, 0, 0, 0.25);box-shadow: 3px 3px 10px 0px rgba(0, 0, 0, 0.25);display:none;z-index: 100;",
     };
@@ -365,4 +365,10 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.el-divider >>> .el-divider__text{
+  font-size:25px;
+}
+.el-button{
+  padding:3px, 6px;
+}
 </style>

@@ -3,10 +3,10 @@
     <el-row style="margin-top:50px"> 
       
       <el-col :span="12">
-        <el-button type="primary" size="small" @click="hideAll()">hide all</el-button>
+        <el-button type="primary" size="large" style="font-size:25px" @click="hideAll()">Hide All</el-button>
       </el-col>
       <el-col :span="12">
-        <el-button type="primary" size="small" @click="showAll()">show all</el-button>
+        <el-button type="primary" size="large" style="font-size:25px" @click="showAll()">Show All</el-button>
       </el-col>
 
     </el-row>
@@ -59,7 +59,7 @@ export default {
       legendControl:30,
       lengendInterval:25,
       marginLeft: 10,
-      marginTop: 20,
+      marginTop: 10,
       marginRight:10,
       marginBottom:30,
       cicleSize:6,
@@ -121,7 +121,7 @@ export default {
       .append("text").attr("x",10).attr("y", (d,i)=>{return 5 + i * (cur.lengendInterval)}).text(d=>d)
         .attr("text-anchor", "left")
         .style("opacity",0.95)
-        .style("font-size", "12px")
+        .style("font-size", "15px")
    
   }
   

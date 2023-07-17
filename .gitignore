@@ -5,6 +5,8 @@ datasets
 public
 src/assets
 html/
+src/components/topoSummaryCopy.vue
+src/AppLayout0226copy.vue
 
 
 # local env files

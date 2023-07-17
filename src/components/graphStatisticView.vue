@@ -2,22 +2,22 @@
 // https://d3-graph-gallery.com/graph/density_basic.html
 <template>
   <div id="graphStatisticView" :style="divCss">
-    <el-divider> Over View </el-divider>
-    <svg id="speedAccYaw" :width="width" :height="height">
+    <el-divider> Overview </el-divider>
+    <svg id="speedAccYaw" :width="width" :height="densityHeight * 3 + 5 * marginTop">
       <g id="speedDensity">
-        <foreignObject :x="width/2- 40" y="0" width="80" height="40">
-          <text> Speed</text>
+        <foreignObject :x="width- 150" y="0" width="80" height="40">
+          <text style="font-size:22px"> Speed</text>
         </foreignObject>
         
       </g>
       <g id="accDensity" :transform="`translate(0, ${densityHeight + marginTop})`">
-        <foreignObject :x="width/2- 40" y="0" width="80" height="40">
-          <text> Acceleration</text>
+        <foreignObject :x="width- 180" y="0" width="150" height="40">
+          <text style="font-size:22px"> Acceleration</text>
         </foreignObject>
       </g>
       <g id="yawDensity" :transform="`translate(0, ${(densityHeight + marginTop) * 2})`">
-        <foreignObject :x="width/2- 40" y="0" width="80" height="40">
-          <text> YawDiff</text>
+        <foreignObject :x="width- 150" y="0" width="80" height="40">
+          <text style="font-size:22px"> YawDiff</text>
         </foreignObject>
 
       </g>
@@ -49,7 +49,7 @@ export default {
     ...mapState(["speedFillColor", "accelerationColor", "yawDiffColor"]),
 
     densityHeight(){
-      return (this.height - this.marginTop * 5 - this.top )/ 3
+      return (this.height -6 - this.marginTop * 6 )/ 3
     },
     divCss() {
       return (
@@ -180,4 +180,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.el-divider >>> .el-divider__text{
+  font-size:25px;
+}
 </style>

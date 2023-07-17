@@ -6,12 +6,12 @@
       <el-col :span = "12" >
         
         <el-row align = "middle" justify = "center">
-          <label style="font-size:18px"> Choose the logId of video</label> 
+          <label style="font-size:22px"> Choose the logId of video</label> 
      
         </el-row>
       </el-col>
       <el-col :span = "12">
-        <el-select style="width:100%" v-model="selectLogId" class="m-2" placeholder="Select" >
+        <el-select style="width:100%;font-size:20px" v-model="selectLogId" class="m-2" placeholder="Select" >
         <el-option
       v-for="(item,i) in logList"
       :key="i"
@@ -23,13 +23,13 @@
     </el-row>
     <el-row style="margin-bottom:3px">
       <el-col :span = "12">
-        <el-button type="primary" style = "width:80%" @click = "search">
+        <el-button type="primary" style = "width:80% ; font-size:20px" @click = "search">
           <font-awesome-icon icon="fa-solid fa-magnifying-glass" />
           <label style="margin-left:3px"> Search </label>
           </el-button>
       </el-col>
       <el-col :span = "12">
-        <el-button type="primary" :loading="loading" style = "width:80%" disabled>
+        <el-button type="primary" :loading="loading" style = "width:80%; font-size:20px" disabled>
           <!-- <font-awesome-icon icon="fa-solid fa-spinner" /> -->
           <label style="margin-left:3px"> Loading </label>
   </el-button>
@@ -38,10 +38,10 @@
     <el-card  >
       <el-scrollbar >
         <!-- :height = "height" -->
-      <a-collapse v-model:activeKey="activeKey">
+      <a-collapse v-model:activeKey="activeKey" style="font-size:22px">
     <a-collapse-panel key="nodes" :header="'Nodes (' + (1 + vehicleNodes.length + 
     peopleNodes.length + laneNodes.length) +')'">
-      <a-collapse v-model:activeKey="activeKeyEgo">
+      <a-collapse v-model:activeKey="activeKeyEgo"  style="font-size:20px">
         <!-- 可以加入当前速度信息 -->
     <a-collapse-panel key="ego" header="Ego">
       <a-row justify = "space-around"> 
@@ -422,6 +422,9 @@ export default {
 .el-card >>> .el-card__body {
   height: 100%;
   
+}
+.el-divider >>> .el-divider__text{
+  font-size:25px;
 }
 .el-button .custom-loading .circular .path {
   animation: loading-dash 1.5s ease-in-out infinite;

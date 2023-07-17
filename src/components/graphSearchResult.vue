@@ -2,9 +2,10 @@
   
   <div id="multiGraph" :style="divCss" >
     <el-divider> {{ currentRes }} </el-divider>
-    <el-descriptions :column="2" border size="small">
-    <el-descriptions-item label="LogNum">{{ searchLogNum }} / 47</el-descriptions-item>
-    <el-descriptions-item label="FrameNum">{{ searchFrameNum }} / 8172</el-descriptions-item>
+    <!-- size="small" -->
+    <el-descriptions :column="2" border size="large" >
+    <el-descriptions-item  label="LogNum">{{ searchLogNum }} / 47</el-descriptions-item>
+    <el-descriptions-item  label="FrameNum">{{ searchFrameNum }} / 8172</el-descriptions-item>
     
     
   </el-descriptions>
@@ -75,7 +76,7 @@ export default {
       tooltipContent: "",
 
       tooltip_css:
-        "position: absolute;padding: 7px;font-size: 0.9em;pointer-events: none;background: #fff;border: 1px solid #ccc;" +
+        "position: absolute;padding: 7px;font-size: 20px;pointer-events: none;background: #fff;border: 1px solid #ccc;" +
         "border-radius: 4px;-moz-box-shadow: 3px 3px 10px 0px rgba(0, 0, 0, 0.25);display:none" +
         "-webkit-box-shadow: 3px 3px 10px 0px rgba(0, 0, 0, 0.25);box-shadow: 3px 3px 10px 0px rgba(0, 0, 0, 0.25);display:none;z-index: 100;",
     };
@@ -107,10 +108,12 @@ export default {
     },
     currentRes(){
       if(this.searchViewState){
-        return "Graph Search Result"
+        return "Multiple View"
+        // return "Graph Search Result"
       }
       else{
-        return "Brush Result"
+        return "Multiple View"
+        // return "Brush Result"
       }
     },
     divCss() {
@@ -152,8 +155,8 @@ export default {
       this.tooltipContent = "logId : " + logId_ + "<br>" + "frame : " + frm + "<br>" + "total_frame : " + frame_len.toString();
       if (action == "over") {
         tooltip.css("display", "block");
-        tooltip.css("left", $event.offsetX + 40);
-        tooltip.css("top", $event.offsetY - 10);
+        tooltip.css("left", $event.offsetX + 100);
+        tooltip.css("top", $event.offsetY +60);
       } else {
         tooltip.css("display", "none");
       }
@@ -500,6 +503,10 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .el-scrollbar{
-  height:90%;
+  height:85%;
 }
+.el-divider >>> .el-divider__text{
+  font-size:25px;
+}
+
 </style>

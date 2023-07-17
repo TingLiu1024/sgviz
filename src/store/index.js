@@ -20,7 +20,7 @@ export default createStore({
     egoColor: "red",
     accelerationColor:"#fb9a99",
     yawDiffColor:"#bf5b17",
-
+    legendFontSize:"22px",
     currentTrackingData:"",
     logListDict:logListDict,
     currentSgData:"",

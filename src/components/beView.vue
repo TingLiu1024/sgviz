@@ -1,6 +1,6 @@
 <template>
   <div id="bev" :style="divCss">
-    <el-divider>Bird Eye View</el-divider>
+    <el-divider>Bird's Eye View</el-divider>
 
     <svg :width="svgWidth" :height="svgWidth">
       <!-- 道路 -->
@@ -180,15 +180,15 @@ export default {
       nIntervId: "", // 控制播放
       playInterval: 100,
       legendW: 15,
-      legendH: 10,
-      legendInterVal: 10,
-      marginLeft: 85,
-      marginTop: 420,
+      legendH: 15,
+      legendInterVal: 15,
+      marginLeft: 120,
+      marginTop: 370,
       egoSize: 6,
       lineGenerator: d3.line(),
       tooltipContent: "",
       tooltip_css:
-        "position: absolute;padding: 7px;font-size: 0.9em;pointer-events: none;background: rgba(255,255,255,0.6);border: 1px solid #ccc;" +
+        "position: absolute;padding: 7px;font-size: 25px;pointer-events: none;background: rgba(255,255,255,0.6);border: 1px solid #ccc;" +
         "border-radius: 4px;-moz-box-shadow: 3px 3px 10px 0px rgba(0, 0, 0, 0.25);display:none" +
         "-webkit-box-shadow: 3px 3px 10px 0px rgba(0, 0, 0, 0.25);box-shadow: 3px 3px 10px 0px rgba(0, 0, 0, 0.25);display:none;z-index: 100;",
     };
@@ -361,12 +361,12 @@ export default {
       .append("text")
       .attr("x", 30)
       .attr("y", (d, i) => {
-        return 10 + (i + 1) * (cur.legendInterVal + cur.legendH);
+        return 15 + (i + 1) * (cur.legendInterVal + cur.legendH);
       })
       .text((d) => d)
       .attr("text-anchor", "left")
       .style("opacity", 0.95)
-      .style("font-size", "12px");
+      .style("font-size", "20px");
   },
   watch: {
     currentTimestamp: function () {
@@ -471,4 +471,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.el-divider >>> .el-divider__text{
+  font-size:25px;
+}
 </style>

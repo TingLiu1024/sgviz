@@ -73,10 +73,10 @@ export default {
       lastFdgLayout: [], //
       // tooltip :$("#bevTip"),
       legendW: 15,
-      legendH: 10,
-      legendInterVal: 10,
+      legendH: 15,
+      legendInterVal: 15,
       marginLeft: 85,
-      marginTop: 250,
+      marginTop: 220,
       egoSize: 9,
       vehSize: 100,
       relStrokeColorDict: {
@@ -90,14 +90,14 @@ export default {
       lassoFlag: false,
       lineGenerator: d3.line(),
       tooltip_css:
-        "position: absolute;padding: 7px;font-size: 0.9em;pointer-events: none;background:rgba(255,255,255,0.6);border: 1px solid #ccc;" +
+        "position: absolute;padding: 7px;font-size: 22px;pointer-events: none;background:rgba(255,255,255,0.6);border: 1px solid #ccc;" +
         "border-radius: 4px;-moz-box-shadow: 3px 3px 10px 0px rgba(0, 0, 0, 0.25);display:none" +
         "-webkit-box-shadow: 3px 3px 10px 0px rgba(0, 0, 0, 0.25);box-shadow: 3px 3px 10px 0px rgba(0, 0, 0, 0.25);display:none;z-index: 100;",
     };
   },
 
   computed: {
-    ...mapState(["currentSgData"]),
+    ...mapState(["currentSgData", "legendFontSize"]),
     ...mapState([
       "laneColor",
       "vehColor",
@@ -160,12 +160,12 @@ export default {
       .append("text")
       .attr("x", 30)
       .attr("y", (d, i) => {
-        return 10 + (i + 1) * (cur.legendInterVal + cur.legendH);
+        return 15 + (i + 1) * (cur.legendInterVal + cur.legendH);
       })
       .text((d) => d)
       .attr("text-anchor", "left")
       .style("opacity", 0.95)
-      .style("font-size", "12px");
+      .style("font-size", cur.legendFontSize);
   },
   methods: {
     inside(point, vs) {
@@ -343,7 +343,7 @@ export default {
             "</p>";
           tooltip.css("display", "block");
           tooltip.css("left", event.offsetX + 40);
-          tooltip.css("top", event.offsetY - 10);
+          tooltip.css("top", event.offsetY -30);
         })
         .on("mouseout", function () {
           let tooltip = $("#sgTip");
@@ -450,7 +450,7 @@ export default {
           
           tooltip.css("display", "block");
           tooltip.css("left", event.offsetX + 40);
-          tooltip.css("top", event.offsetY - 10);
+          tooltip.css("top", event.offsetY -30);
           if (d.label_class == "LANE") {
             cur.$store.commit("updateSgCurrentOverLane", d.track_label_uuid);
           } else if (d.label_class == "VEHICLE") {
@@ -598,4 +598,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.el-divider >>> .el-divider__text{
+  font-size:25px;
+}
 </style>

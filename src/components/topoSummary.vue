@@ -10,7 +10,7 @@
         :transform="`translate(${marginLeft+timeScale(parseInt(currentTime))}, ${timelineHeight/2
         })`"
       >
-        <path :d="drawStar(8)" fill="red" fill-opacity="0.9" />
+        <path :d="drawStar(egoSize)" fill="red" fill-opacity="0.9" />
       </g>
       </g>
       <g id = "topoheatmap"></g>
@@ -44,13 +44,15 @@ export default {
       legendHeight:40,
       timelineHeight:20,
       DisappearOpactiy:0.5,
+      rectHeight:15,
+      egoSize:10,
       streamColorDict:{
         "PEOPLE_notOnLane":"#FFCDBF", "PEOPLE_onLane":"#FF8680", "VEHICLE_onLane":"#1f78b4","VEHICLE_notOnLane":"#a6cee3",
         "PEOPLE": "#D25565" ,"VEHICLE":"#3E6D9C"
       },
       tooltipContent:"",
       tooltip_css:
-        "position: absolute;padding: 7px;font-size: 0.9em;pointer-events: none;background: rgba(255,255,255,0.6);border: 1px solid #ccc;" +
+        "position: absolute;padding: 7px;font-size: 25px;pointer-events: none;background: rgba(255,255,255,0.6);border: 1px solid #ccc;" +
         "border-radius: 4px;-moz-box-shadow: 3px 3px 10px 0px rgba(0, 0, 0, 0.25);display:none" +
         "-webkit-box-shadow: 3px 3px 10px 0px rgba(0, 0, 0, 0.25);box-shadow: 3px 3px 10px 0px rgba(0, 0, 0, 0.25);display:none;z-index: 100;",
       
@@ -58,7 +60,7 @@ export default {
     }
   },
   computed:{
-    ...mapState(["currentEventData", "currentTrackingData", "currentTime"]),
+    ...mapState(["currentEventData", "currentTrackingData", "currentTime","legendFontSize"]),
     timeRange() {
       if (this.currentTrackingData) {
         return d3.extent(
@@ -69,12 +71,11 @@ export default {
       }
     },
     timeScale(){
-      let rectH = (this.width - this.marginRight - this.marginLeft) / (this.timeRange[1] + 1)
-      let cur = this
-      return  d3.scaleLinear()
+        return d3.scaleLinear()
                 .domain([this.timeRange[0], this.timeRange[1]])
-                .range([0+rectH/2, rectH * (cur.timeRange[1] +1)- rectH / 2] );
+                .range([0, this.width - this.marginRight -this.marginLeft]);
     },
+    
     divCss() {
       return (
         "position: absolute; border: 0px solid black;" +
@@ -97,11 +98,13 @@ export default {
       let cur = this
       return d3.line()([[0, cur.timelineHeight/2], [rectH * (cur.timeRange[1] +1), cur.timelineHeight/2]])
     },
+    rectWidth(){
+      return (this.width - this.marginRight - this.marginLeft) / (this.timeRange[1] + 1)
+
+    },
     eventHeatmapHeight(){
-      let rectH = (this.width - this.marginRight - this.marginLeft) / (this.timeRange[1] + 1)
-      // this.heatRectH = rectH
-      // console.log(rectH)
-      return rectH * 14
+     
+      return this.rectHeight * 14
 
     }
   },
@@ -141,7 +144,7 @@ export default {
         heatmapData.push(tmpDict)
       })
       // console.log(heatmapData)
-      const rectH = this.eventHeatmapHeight / 14
+      const rectH = this.eventHeatmapHeight / 14+5
       let cur = this
       // const timelineGroup = d3.select("#topotimeline")
       // .attr("transform", `translate(${cur.marginLeft }, ${cur.marginTop })`)
@@ -152,11 +155,11 @@ export default {
       group.selectChildren().remove()
       const heatmapYscale = d3.scalePoint().domain(["freeObjectDisappear",'laneObjectDisappear',
       "freeObjectAppear",'laneObjectAppear', "freeToLane", "laneToFree", "changeLane"
-    ]).range([0, rectH * 6])
+    ]).range([0, cur.rectHeight * 6])
     let minRectRatio = 0.55
     const rectHScale = d3.scaleLinear().domain( d3.extent(
       d3.map(heatmapData, d=> d.count)
-    )).range([rectH * minRectRatio, rectH])
+    )).range([cur.rectHeight * minRectRatio, cur.rectHeight])
     // const opacityScale = d3.scaleLinear().domain([1, d3.max(
     //   d3.map(heatmapData, d=> d.count)
     // )]).range([0.3,1])
@@ -165,19 +168,19 @@ export default {
     group.append("g").selectAll(".borderPath").data([0,1,2,3,4,5,6,7,
     8,9,10,11,12,13,14]).enter().append("path")
     .attr('d', d => {
-        return lineGen([[0, d * rectH], [rectH * (cur.timeRange[1] +1), d * rectH]])}
+        return lineGen([[0, d * cur.rectHeight], [this.width - this.marginRight - this.marginLeft, d * cur.rectHeight]])}
       )
       .attr("stroke-width", 1)
       .attr("stroke", "grey")
       .attr("stroke-opacity", 1)
     let tooltip = $("#topoTip");
       group.append("g").selectAll(".objectRect").data(heatmapData).enter().append("rect")
-      .attr('x', (d) => d.frame * rectH)
-      .attr('y', (d) => d.label_class == "VEHICLE"?heatmapYscale(d.event):(rectH *7 + heatmapYscale(d.event)))
-      .attr('width', d => rectHScale(d.count))
+      .attr('x', (d) => cur.timeScale(d.frame) - cur.rectWidth /2)
+      .attr('y', (d) => d.label_class == "VEHICLE"?heatmapYscale(d.event):(cur.rectHeight *7 + heatmapYscale(d.event)))
+      .attr('width', d => cur.rectWidth)
       .attr('height', d => rectHScale(d.count))
-      .attr('transform', d => "translate(" + (rectH - rectHScale(d.count))/2 +"," + (rectH - rectHScale(d.count))/2
-      + ")")
+      // .attr('transform', d => "translate(" + (rectH - rectHScale(d.count))/2 +"," + (rectH - rectHScale(d.count))/2
+      // + ")")
       .attr('fill', d => cur.streamColorDict[d.label_class] )
       .attr("opacity", d => {
         // console.log(d)
@@ -196,13 +199,14 @@ export default {
           return 0
         }
         else if(d.event == "freeToLane"){
-          return "0,"+rectHScale(d.count) + "," + rectHScale(d.count) + ", 0"
+          return "0,"+ cur.rectWidth+ "," +  rectHScale(d.count)+ ", 0"
         }
         else if(d.event == "laneToFree"){
-          return rectHScale(d.count) + "," + rectHScale(d.count)
+          return cur.rectWidth + "," + rectHScale(d.count)
         }
         else{
-          return "0,"+rectHScale(d.count)/4 + "," + rectHScale(d.count)/2 + "," + rectHScale(d.count)/4
+          return "0,"+cur.rectWidth/4 + "," + cur.rectWidth/2 + "," + (cur.rectWidth/4 
+          +rectHScale(d.count)/4) + "," + rectHScale(d.count)/2 + "," + rectHScale(d.count)/4
         }
         
       })
@@ -220,7 +224,7 @@ export default {
      
         tooltip.css("display", "block");
         tooltip.css("left", event.offsetX + 40);
-        tooltip.css("top", event.offsetY - 10);
+        tooltip.css("top", event.offsetY - 50);
         cur.tooltipContent = "frame : " + d.frame + "<br>" + 
         " label : "  + d.label_class + "<br>" 
                     + "event : " + d.event + "<br>"
@@ -229,21 +233,21 @@ export default {
       .on("mouseout",()=>{
         tooltip.css("display", "none");
       })
-      const legendGroup = d3.select("#topolegend").attr("transform", `translate(${cur.marginLeft}, ${cur.marginTop + cur.timelineHeight + cur.eventHeatmapHeight})`)
+      const legendGroup = d3.select("#topolegend").attr("transform", `translate(${0}, ${cur.marginTop + cur.timelineHeight + cur.eventHeatmapHeight})`)
       legendGroup.append("g").selectAll('.objectType').data(["VEHICLE", "PEOPLE"]).enter().append("circle")
-      .attr("cx", (d,i) => 200+ i *20)
+      .attr("cx", (d,i) => cur.width /6 + i * 30 -20)
       .attr("cy", cur.legendHeight/2)
-      .attr('r', 6)
+      .attr('r', 10)
       .attr("fill", d=>cur.streamColorDict[d] )
       legendGroup.append("g").selectAll('.objectTypeText').data(["VEHICLE / PEOPLE"]).enter().append("text")
       .text(d=>d)
       
-      .attr("x", 200 - 140).attr("y", cur.legendHeight/2 + 5)
+      .attr("x",cur.width /6-240).attr("y", cur.legendHeight/2 + 10)
         .attr("text-anchor", "left")
         .style("opacity",0.95)
-        .style("font-size", "12px")
+        .style("font-size", cur.legendFontSize)
         legendGroup.append("g").selectAll('.actionType').data(["Appear", "Disappear"]).enter().append("rect")
-      .attr("x", (d,i) => cur.width / 4 + i *20)
+      .attr("x", (d,i) => cur.width /3+ i *30 -15)
       .attr("y", cur.legendHeight/2 - rectH / 2)
       .attr('width', rectH)
       .attr('height', rectH)
@@ -252,13 +256,13 @@ export default {
       legendGroup.append("g").selectAll('.actionTypeText').data(["Appear / Disappear"]).enter().append("text")
       .text(d=>d)
       
-      .attr("x", cur.width / 4 - 140).attr("y", cur.legendHeight/2 + 5)
+      .attr("x", cur.width /3 - 220).attr("y", cur.legendHeight/2 + 10)
         .attr("text-anchor", "left")
         .style("opacity",0.95)
-        .style("font-size", "12px")
+        .style("font-size", cur.legendFontSize)
 
         legendGroup.append("g").selectAll('.onLaneType').data(["free", "onLane"]).enter().append("rect")
-      .attr("x", (d,i) => cur.width / 2 + i *20)
+      .attr("x", (d,i) => cur.width / 2 + i *30 -50)
       .attr("y", cur.legendHeight/2 - rectH / 2)
       .attr('width', rectH)
       .attr('height', rectH)
@@ -268,13 +272,13 @@ export default {
       legendGroup.append("g").selectAll('.onLaneTypeText').data(["free / onLane"]).enter().append("text")
       .text(d=>d)
       
-      .attr("x", cur.width / 2 - 140).attr("y", cur.legendHeight/2 + 5)
+      .attr("x", cur.width / 2 - 200).attr("y", cur.legendHeight/2 + 10)
         .attr("text-anchor", "left")
         .style("opacity",0.95)
-        .style("font-size", "12px")
+        .style("font-size", cur.legendFontSize)
       
         legendGroup.append("g").selectAll('.chanegLaneType').data(["freeToLane", "laneToFree", "changeLane"]).enter().append("rect")
-      .attr("x", (d,i) => cur.width / 4 * 3 + i *20)
+      .attr("x", (d,i) => cur.width / 4 * 3 + i *30 )
       .attr("y", cur.legendHeight/2 - rectH / 2)
       .attr('width', rectH)
       .attr('height', rectH)
@@ -295,14 +299,14 @@ export default {
       })
       legendGroup.append("g").selectAll('.changeLaneTypeText').data(["freeToLane / laneToFree / changeLane"]).enter().append("text")
       .text(d=>d)
-      .attr("x", cur.width / 4 * 3 - 240).attr("y", cur.legendHeight/2 + 5)
+      .attr("x", cur.width / 4 * 3 - 390).attr("y", cur.legendHeight/2 + 10)
         .attr("text-anchor", "left")
         .style("opacity",0.95)
-        .style("font-size", "12px")
+        .style("font-size", cur.legendFontSize)
         legendGroup.append("g").selectAll('.symbolSize').data(["small", "large"]).enter().append("rect")
-      .attr("x", (d,i) => cur.width -140+ i *20)
-      .attr("y", (d,i) =>  cur.legendHeight/2 - rectH / (2- i) / 2 )
-      .attr('width', (d,i) => rectH / (2- i))
+      .attr("x", (d,i) => cur.width -80+ i *30)
+      .attr("y", (d,i) =>  cur.legendHeight/2 - rectH / 2 )
+      .attr('width', (d,i) => rectH )
       .attr('height', (d,i) => rectH / (2- i))
       .attr("fill", cur.streamColorDict["VEHICLE"] )
       .attr("opacity", 1)
@@ -310,10 +314,10 @@ export default {
       
       legendGroup.append("g").selectAll('.laneChangeTypeText').data(["Number of Occurrence"]).enter().append("text")
       .text(d=>d)
-      .attr("x", cur.width  -300).attr("y", cur.legendHeight/2 + 5)
+      .attr("x", cur.width  -310).attr("y", cur.legendHeight/2 + 10)
         .attr("text-anchor", "left")
         .style("opacity",0.95)
-        .style("font-size", "12px")
+        .style("font-size", cur.legendFontSize)
     },
   },
   mounted(){
@@ -327,5 +331,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
+.el-divider >>> .el-divider__text{
+  font-size:25px;
+}
 </style>
